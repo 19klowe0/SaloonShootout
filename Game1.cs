@@ -9,6 +9,8 @@ namespace SaloonShootout
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        Model gun;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -27,6 +29,8 @@ namespace SaloonShootout
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            gun = Content.Load<Model>("RevolverBeforeBake");
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -43,6 +47,21 @@ namespace SaloonShootout
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            Matrix proj = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60),
+                                                                                  1,
+                                                                                  0.001f,
+                                                                                  100f);
+
+            Matrix view = Matrix.CreateLookAt(new Vector3(0, 6, 20),
+                                              new Vector3(0, 0, 0),
+                                              new Vector3(0, 1, 0));
+
+            Matrix world = Matrix.CreateScale(0.045f) *
+                           Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
+                           Matrix.CreateTranslation(Vector3.Zero);
+
+            gun.Draw(world, view, proj);
 
             // TODO: Add your drawing code here
 
