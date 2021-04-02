@@ -13,7 +13,7 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin ../../SaloonShootoutAssets/RevolverBeforeBake.fbx
+#begin RevolverBeforeBake.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -30,7 +30,7 @@
 /processorParam:Scale=1
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:../../SaloonShootoutAssets/RevolverBeforeBake.fbx;RevolverBeforeBake.fbx
+/build:RevolverBeforeBake.fbx
 
 #begin Texture/None_Base_Color.png
 /importer:TextureImporter
