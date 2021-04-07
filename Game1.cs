@@ -31,6 +31,11 @@ namespace SaloonShootout
         Vector3 enemy5Pos;
         Vector3 enemy6Pos;
 
+        //bullet information 
+        //bulletPos will probably need to be array since multiple can be on screen
+        Model bullet;
+        Vector3 bulletPos;
+
         //for different camera view for testing
         Vector3 camOffset;
 
@@ -59,6 +64,9 @@ namespace SaloonShootout
             enemy5Pos = new Vector3(250, 150, -3500);
             enemy6Pos = new Vector3(-250, 150, -3500);
 
+            //test for bullet
+            bulletPos = new Vector3(0,30,100);
+
             base.Initialize();
         }
 
@@ -68,12 +76,13 @@ namespace SaloonShootout
 
             player = Content.Load<Model>("RevolverBeforeBake");
             saloon = Content.Load<Model>("Saloon_Environment");
-            enemy1 = Content.Load<Model>("Cowboy1Tex");
-            enemy2 = Content.Load<Model>("Cowboy2");
-            enemy3 = Content.Load<Model>("Cowboy3");
-            enemy4 = Content.Load<Model>("Cowboy4");
+            enemy1 = Content.Load<Model>("Cowboy1");
+            enemy2 = Content.Load<Model>("Cowboy1");
+            enemy3 = Content.Load<Model>("Cowboy1");
+            enemy4 = Content.Load<Model>("Cowboy1");
             enemy5 = enemy1;
             enemy6 = enemy2;
+            bullet = Content.Load<Model>("Bullet");
 
             // TODO: use this.Content to load your game content here
         }
@@ -169,6 +178,28 @@ namespace SaloonShootout
 
             player.Draw(world, view, proj);
             saloon.Draw(environment,view,proj);
+
+            //placing bullet
+            world = Matrix.CreateRotationY(0)
+                                              * Matrix.CreateTranslation(bulletPos)
+                                              * Matrix.CreateScale(.045f) *
+                           Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
+                           Matrix.CreateTranslation(Vector3.Zero);
+            //enable the lighting for the bullet meshes
+            foreach (ModelMesh mesh in bullet.Meshes)
+            {
+                foreach (BasicEffect effect in mesh.Effects)
+                {
+                    effect.World = world;
+                    effect.View = view;
+                    effect.Projection = proj;
+
+                    effect.EnableDefaultLighting();
+                    effect.LightingEnabled = true;
+                }
+            }
+
+            bullet.Draw(world,view,proj);
 
             //Placing all enemies manually
             world = Matrix.CreateTranslation(enemy1Pos)
