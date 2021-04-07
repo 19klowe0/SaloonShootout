@@ -34,7 +34,7 @@ namespace SaloonShootout
         //bullet information 
         //bulletPos will probably need to be array since multiple can be on screen
         Model bullet;
-        //Vector3 bulletPos;
+        Vector3 bulletPos;
 
         //for different camera view for testing
         Vector3 camOffset;
@@ -65,7 +65,7 @@ namespace SaloonShootout
             enemy6Pos = new Vector3(-250, 150, -3500);
 
             //test for bullet
-            //bulletPos = new Vector3(0,30,100);
+            bulletPos = new Vector3(0,30,100);
 
             base.Initialize();
         }
@@ -82,7 +82,7 @@ namespace SaloonShootout
             enemy4 = Content.Load<Model>("Cowboy1");
             enemy5 = enemy1;
             enemy6 = enemy2;
-            //bullet = Content.Load<Model>("Bullet");
+            bullet = Content.Load<Model>("Bullet");
 
             // TODO: use this.Content to load your game content here
         }
@@ -179,7 +179,7 @@ namespace SaloonShootout
             player.Draw(world, view, proj);
             saloon.Draw(environment,view,proj);
 
-            /*placing bullet
+            //placing bullet
             world = Matrix.CreateRotationY(0)
                                               * Matrix.CreateTranslation(bulletPos)
                                               * Matrix.CreateScale(.045f) *
@@ -200,7 +200,6 @@ namespace SaloonShootout
             }
 
             bullet.Draw(world,view,proj);
-            */
 
             //Placing all enemies manually
             world = Matrix.CreateTranslation(enemy1Pos)
