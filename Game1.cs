@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace SaloonShootout
 {
@@ -8,6 +9,13 @@ namespace SaloonShootout
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+
+        //icons and timer
+        Texture2D bulletIcon;
+        SpriteFont gameFont;
+        float timer;
+        int score;
+        int bulletCount = 6;
 
         //needed player information
         Vector3 playerPos;
@@ -35,6 +43,10 @@ namespace SaloonShootout
         //bulletPos will probably need to be array since multiple can be on screen
         Model bullet;
         Vector3 bulletPos;
+
+        //mousestate
+        MouseState mstate;
+        bool mRelease = true;
 
         //for different camera view for testing
         Vector3 camOffset;
@@ -84,6 +96,9 @@ namespace SaloonShootout
             enemy6 = enemy2;
             bullet = Content.Load<Model>("Bullet");
 
+            bulletIcon = Content.Load<Texture2D>("BulletIcon");
+            gameFont = Content.Load<SpriteFont>("galleryFont");
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -105,12 +120,57 @@ namespace SaloonShootout
                 playerRot += .10f;
             }
 
+            //mstate controls
+            mstate = Mouse.GetState();
+            if (mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+            {
+                bulletCount--;
+                mRelease = false;
+            }
+            if (mstate.LeftButton == ButtonState.Released)
+            {
+                mRelease = true;
+            }
+            if (mstate.RightButton == ButtonState.Pressed)
+            {
+                bulletCount = 6;
+            }
+
+            // update timer
+            timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            _spriteBatch.Begin();
+
+            //keep here, is needed to render models correctly
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
+
+            //timer and score keeper
+            _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(timer).ToString(), new Vector2(10, 10), Color.Black);
+            _spriteBatch.DrawString(gameFont, "Score: " + score.ToString(), new Vector2(10, 40), Color.Black);
+
+            //sprite controller for buller icons
+            if (bulletCount > 0)
+            {
+                int right = 700;
+                for (int i = 1; i <= bulletCount; i++)
+                {
+                    _spriteBatch.Draw(bulletIcon, new Vector2(right, 0), Color.White);
+                    right -= 50;
+                }
+            }
+            else
+            {
+                _spriteBatch.DrawString(gameFont, "RELOAD!", new Vector2(600, 15), Color.Black);
+            }
 
             //increased the far cipping plane
             Matrix proj = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60),
@@ -185,6 +245,12 @@ namespace SaloonShootout
                                               * Matrix.CreateScale(.045f) *
                            Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
                            Matrix.CreateTranslation(Vector3.Zero);
+
+            //if used for spawing the bullets
+            if ((mstate.LeftButton == ButtonState.Pressed) && (bulletCount > 0))
+            {
+
+            }
             //enable the lighting for the bullet meshes
             foreach (ModelMesh mesh in bullet.Meshes)
             {
@@ -327,6 +393,8 @@ namespace SaloonShootout
             }
 
             enemy6.Draw(world, view, proj);
+
+            _spriteBatch.End();
 
             // TODO: Add your drawing code here
 
