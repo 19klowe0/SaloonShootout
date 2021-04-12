@@ -89,9 +89,9 @@ namespace SaloonShootout
             player = Content.Load<Model>("RevolverBeforeBake");
             saloon = Content.Load<Model>("Saloon_Environment");
             enemy1 = Content.Load<Model>("Cowboy1");
-            enemy2 = Content.Load<Model>("Cowboy1");
-            enemy3 = Content.Load<Model>("Cowboy1");
-            enemy4 = Content.Load<Model>("Cowboy1");
+            enemy2 = Content.Load<Model>("Cowboy2");
+            enemy3 = Content.Load<Model>("Cowboy3");
+            enemy4 = Content.Load<Model>("Cowboy4");
             enemy5 = enemy1;
             enemy6 = enemy2;
             bullet = Content.Load<Model>("Bullet");
