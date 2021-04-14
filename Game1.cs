@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 namespace SaloonShootout
 {
@@ -44,6 +45,8 @@ namespace SaloonShootout
         Model bullet;
         Vector3 bulletPos;
 
+        List<Projectile> bullets;
+
         //mousestate
         MouseState mstate;
         bool mRelease = true;
@@ -76,8 +79,10 @@ namespace SaloonShootout
             enemy5Pos = new Vector3(250, 150, -3500);
             enemy6Pos = new Vector3(-250, 150, -3500);
 
-            //test for bullet
-            bulletPos = new Vector3(0,30,100);
+            ////test for bullet
+            //bulletPos = new Vector3(0,30,100);
+
+            bullets = new List<Projectile>();
 
             base.Initialize();
         }
@@ -122,11 +127,22 @@ namespace SaloonShootout
 
             //mstate controls
             mstate = Mouse.GetState();
-            if (mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+            if (mstate.LeftButton == ButtonState.Pressed && bulletCount > 0 && mRelease == true)
             {
+                playerDir = Vector3.Transform(Vector3.Backward,
+                                              Matrix.CreateRotationY(playerRot));
+
+                bullets.Add(new Projectile(new Vector3(playerPos.X, (float)3.5, playerPos.Z), playerDir));
+
                 bulletCount--;
                 mRelease = false;
             }
+
+            for (int b = 0; b < bullets.Count; b++)
+            {
+                bullets[b].Update(gameTime);
+            }
+
             if (mstate.LeftButton == ButtonState.Released)
             {
                 mRelease = true;
@@ -239,18 +255,6 @@ namespace SaloonShootout
             player.Draw(world, view, proj);
             saloon.Draw(environment,view,proj);
 
-            //placing bullet
-            world = Matrix.CreateRotationY(0)
-                                              * Matrix.CreateTranslation(bulletPos)
-                                              * Matrix.CreateScale(.045f) *
-                           Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
-                           Matrix.CreateTranslation(Vector3.Zero);
-
-            //if used for spawing the bullets
-            if ((mstate.LeftButton == ButtonState.Pressed) && (bulletCount > 0))
-            {
-
-            }
             //enable the lighting for the bullet meshes
             foreach (ModelMesh mesh in bullet.Meshes)
             {
@@ -264,8 +268,15 @@ namespace SaloonShootout
                     effect.LightingEnabled = true;
                 }
             }
+            
+            //Draw Bullets
+            foreach (Projectile b in bullets)
+            {
+                world = Matrix.CreateScale(0.05f) *
+                        Matrix.CreateTranslation(b.Pos);
 
-            bullet.Draw(world,view,proj);
+                bullet.Draw(world, view, proj);
+            }
 
             //Placing all enemies manually
             world = Matrix.CreateTranslation(enemy1Pos)
