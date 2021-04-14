@@ -212,8 +212,7 @@ namespace SaloonShootout
             Matrix world =   Matrix.CreateRotationY(playerRot)
                                               * Matrix.CreateTranslation(playerPos)
                                               *Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
-                           Matrix.CreateTranslation(Vector3.Zero);
+                           Matrix.CreateRotationY(MathHelper.ToRadians(90));
 
             //matrix world for saloon
             Matrix environment = Matrix.CreateRotationY(0)
@@ -272,8 +271,11 @@ namespace SaloonShootout
             //Draw Bullets
             foreach (Projectile b in bullets)
             {
-                world = Matrix.CreateScale(0.05f) *
-                        Matrix.CreateTranslation(b.Pos);
+                world = Matrix.CreateRotationY(playerRot)
+                    *Matrix.CreateRotationY(MathHelper.ToRadians(270))
+                    *Matrix.CreateScale(0.05f) 
+                    * Matrix.CreateTranslation(b.Pos);
+
 
                 bullet.Draw(world, view, proj);
             }
