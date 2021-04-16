@@ -43,9 +43,9 @@ namespace SaloonShootout
         //bullet information 
         //bulletPos will probably need to be array since multiple can be on screen
         Model bullet;
-        Vector3 bulletPos;
 
         List<Projectile> bullets;
+        List<Enemy> enemies;
 
         //mousestate
         MouseState mstate;
@@ -83,6 +83,10 @@ namespace SaloonShootout
             //bulletPos = new Vector3(0,30,100);
 
             bullets = new List<Projectile>();
+
+            enemies = new List<Enemy>();
+            enemies.Add(new Enemy());
+            
 
             base.Initialize();
         }
@@ -152,8 +156,23 @@ namespace SaloonShootout
                 bulletCount = 6;
             }
 
-            // update timer
-            timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            for (int p = 0; p < bullets.Count; p++)
+            {
+                bullets[p].Update(gameTime);
+
+                foreach (Enemy e in enemies)
+                {
+                    if (e.CheckProjectile(bullets[p]))
+                    {
+                        bullets.RemoveAt(p);
+                        --p;
+                        break;
+                    }
+                }
+            }
+
+                // update timer
+                timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             base.Update(gameTime);
         }
@@ -267,9 +286,51 @@ namespace SaloonShootout
                     effect.LightingEnabled = true;
                 }
             }
-            
-            //Draw Bullets
-            foreach (Projectile b in bullets)
+
+            //draw enemies 
+            foreach (Enemy e in enemies)
+            {
+                if (e.Type == Enemy.EnemyType.enemy1)
+                {
+                    world = Matrix.CreateTranslation(enemy1Pos)
+                           * Matrix.CreateScale(0.045f) *
+                           Matrix.CreateRotationY(MathHelper.ToRadians(180)) *
+                           Matrix.CreateTranslation(Vector3.Zero);
+
+
+                    foreach (ModelMesh mesh in enemy1.Meshes)
+                    {
+                        foreach (BasicEffect effect in mesh.Effects)
+                        {
+                            effect.World = world;
+                            effect.View = view;
+                            effect.Projection = proj;
+
+                            effect.EnableDefaultLighting();
+                            effect.LightingEnabled = true;
+                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+
+                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                            {
+                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                            }
+                            else if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            {
+                                effect.World = Matrix.CreateScale(0.004f)
+                                                * Matrix.CreateRotationY(e.Rot)
+                                                * Matrix.CreateRotationX(90)
+                                                * Matrix.CreateTranslation(e.Pos);
+                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                            }
+                        }
+                        //mesh.Draw();
+                        enemy1.Draw(world, view, proj);
+                    }
+                }
+            }
+
+                //Draw Bullets
+                foreach (Projectile b in bullets)
             {
                 world = Matrix.CreateRotationY(playerRot)
                     *Matrix.CreateRotationY(MathHelper.ToRadians(270))
@@ -286,126 +347,128 @@ namespace SaloonShootout
                            Matrix.CreateRotationY(MathHelper.ToRadians(180)) *
                            Matrix.CreateTranslation(Vector3.Zero);
 
+            #region
             //enable the lighting for the enemy meshes
-            foreach (ModelMesh mesh in enemy1.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.World = world;
-                    effect.View = view;
-                    effect.Projection = proj;
+            //foreach (ModelMesh mesh in enemy1.Meshes)
+            //{
+            //    foreach (BasicEffect effect in mesh.Effects)
+            //    {
+            //        effect.World = world;
+            //        effect.View = view;
+            //        effect.Projection = proj;
 
-                    effect.EnableDefaultLighting();
-                    effect.LightingEnabled = true;
-                }
-            }
+            //        effect.EnableDefaultLighting();
+            //        effect.LightingEnabled = true;
+            //    }
+            //}
 
-            enemy1.Draw(world, view, proj);
+            //enemy1.Draw(world, view, proj);
 
-            world = Matrix.CreateTranslation(enemy2Pos)
-                           * Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(MathHelper.ToRadians(180)) *
-                           Matrix.CreateTranslation(Vector3.Zero);
+            //world = Matrix.CreateTranslation(enemy2Pos)
+            //               * Matrix.CreateScale(0.045f) *
+            //               Matrix.CreateRotationY(MathHelper.ToRadians(180)) *
+            //               Matrix.CreateTranslation(Vector3.Zero);
 
-            //enable the lighting for the enemy meshes
-            foreach (ModelMesh mesh in enemy2.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.World = world;
-                    effect.View = view;
-                    effect.Projection = proj;
+            ////enable the lighting for the enemy meshes
+            //foreach (ModelMesh mesh in enemy2.Meshes)
+            //{
+            //    foreach (BasicEffect effect in mesh.Effects)
+            //    {
+            //        effect.World = world;
+            //        effect.View = view;
+            //        effect.Projection = proj;
 
-                    effect.EnableDefaultLighting();
-                    effect.LightingEnabled = true;
-                }
-            }
+            //        effect.EnableDefaultLighting();
+            //        effect.LightingEnabled = true;
+            //    }
+            //}
 
-            enemy2.Draw(world, view, proj);
+            //enemy2.Draw(world, view, proj);
 
-            world = Matrix.CreateTranslation(enemy3Pos)
-                           * Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
-                           Matrix.CreateTranslation(Vector3.Zero);
+            //world = Matrix.CreateTranslation(enemy3Pos)
+            //               * Matrix.CreateScale(0.045f) *
+            //               Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
+            //               Matrix.CreateTranslation(Vector3.Zero);
 
-            //enable the lighting for the enemy meshes
-            foreach (ModelMesh mesh in enemy3.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.World = world;
-                    effect.View = view;
-                    effect.Projection = proj;
+            ////enable the lighting for the enemy meshes
+            //foreach (ModelMesh mesh in enemy3.Meshes)
+            //{
+            //    foreach (BasicEffect effect in mesh.Effects)
+            //    {
+            //        effect.World = world;
+            //        effect.View = view;
+            //        effect.Projection = proj;
 
-                    effect.EnableDefaultLighting();
-                    effect.LightingEnabled = true;
-                }
-            }
+            //        effect.EnableDefaultLighting();
+            //        effect.LightingEnabled = true;
+            //    }
+            //}
 
-            enemy3.Draw(world, view, proj);
+            //enemy3.Draw(world, view, proj);
 
-            world = Matrix.CreateTranslation(enemy4Pos)
-                           * Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(MathHelper.ToRadians(-90)) *
-                           Matrix.CreateTranslation(Vector3.Zero);
+            //world = Matrix.CreateTranslation(enemy4Pos)
+            //               * Matrix.CreateScale(0.045f) *
+            //               Matrix.CreateRotationY(MathHelper.ToRadians(-90)) *
+            //               Matrix.CreateTranslation(Vector3.Zero);
 
-            //enable the lighting for the enemy meshes
-            foreach (ModelMesh mesh in enemy4.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.World = world;
-                    effect.View = view;
-                    effect.Projection = proj;
+            ////enable the lighting for the enemy meshes
+            //foreach (ModelMesh mesh in enemy4.Meshes)
+            //{
+            //    foreach (BasicEffect effect in mesh.Effects)
+            //    {
+            //        effect.World = world;
+            //        effect.View = view;
+            //        effect.Projection = proj;
 
-                    effect.EnableDefaultLighting();
-                    effect.LightingEnabled = true;
-                }
-            }
+            //        effect.EnableDefaultLighting();
+            //        effect.LightingEnabled = true;
+            //    }
+            //}
 
-            enemy4.Draw(world, view, proj);
+            //enemy4.Draw(world, view, proj);
 
-            world = Matrix.CreateTranslation(enemy5Pos)
-                           * Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(MathHelper.ToRadians(-25)) *
-                           Matrix.CreateTranslation(Vector3.Zero);
+            //world = Matrix.CreateTranslation(enemy5Pos)
+            //               * Matrix.CreateScale(0.045f) *
+            //               Matrix.CreateRotationY(MathHelper.ToRadians(-25)) *
+            //               Matrix.CreateTranslation(Vector3.Zero);
 
-            //enable the lighting for the enemy meshes
-            foreach (ModelMesh mesh in enemy5.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.World = world;
-                    effect.View = view;
-                    effect.Projection = proj;
+            ////enable the lighting for the enemy meshes
+            //foreach (ModelMesh mesh in enemy5.Meshes)
+            //{
+            //    foreach (BasicEffect effect in mesh.Effects)
+            //    {
+            //        effect.World = world;
+            //        effect.View = view;
+            //        effect.Projection = proj;
 
-                    effect.EnableDefaultLighting();
-                    effect.LightingEnabled = true;
-                }
-            }
+            //        effect.EnableDefaultLighting();
+            //        effect.LightingEnabled = true;
+            //    }
+            //}
 
-            enemy5.Draw(world, view, proj);
+            //enemy5.Draw(world, view, proj);
 
-            world = Matrix.CreateTranslation(enemy6Pos)
-                           * Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(MathHelper.ToRadians(25)) *
-                           Matrix.CreateTranslation(Vector3.Zero);
+            //world = Matrix.CreateTranslation(enemy6Pos)
+            //               * Matrix.CreateScale(0.045f) *
+            //               Matrix.CreateRotationY(MathHelper.ToRadians(25)) *
+            //               Matrix.CreateTranslation(Vector3.Zero);
 
-            //enable the lighting for the enemy meshes
-            foreach (ModelMesh mesh in enemy6.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.World = world;
-                    effect.View = view;
-                    effect.Projection = proj;
+            ////enable the lighting for the enemy meshes
+            //foreach (ModelMesh mesh in enemy6.Meshes)
+            //{
+            //    foreach (BasicEffect effect in mesh.Effects)
+            //    {
+            //        effect.World = world;
+            //        effect.View = view;
+            //        effect.Projection = proj;
 
-                    effect.EnableDefaultLighting();
-                    effect.LightingEnabled = true;
-                }
-            }
+            //        effect.EnableDefaultLighting();
+            //        effect.LightingEnabled = true;
+            //    }
+            //}
 
-            enemy6.Draw(world, view, proj);
+            //enemy6.Draw(world, view, proj);
+            #endregion
 
             _spriteBatch.End();
 
