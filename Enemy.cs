@@ -13,6 +13,8 @@ namespace SaloonShootout
         static Random rand;
         Vector3 pos;
         float rot;
+        float radius;
+
 
         public enum EnemyType { enemy1};
         public enum EnemyBehavior { Random, Freeze, Attack, Dead };
@@ -21,6 +23,11 @@ namespace SaloonShootout
         {
             get { return pos; }
             set { pos = value; }
+        }
+        public float Radius
+        {
+            get { return radius; }
+            set { radius = value; }
         }
 
         public float Rot
@@ -60,6 +67,7 @@ namespace SaloonShootout
             //rot = MathHelper.ToRadians(rand.Next(0, 360));
             rot = MathHelper.ToRadians(180);
             //behavior = EnemyBehavior.Random;
+            radius = 1000f;
         }
 
         public void Update(GameTime gameTime)
@@ -100,14 +108,18 @@ namespace SaloonShootout
                 }
             }
         }
+        public BoundingSphere boundingSphere
+        {
+            get { return new BoundingSphere(pos, radius); }
+        }
 
         public bool CheckProjectile(Projectile p)
         {
-            if (Vector3.Distance(Pos, p.Pos) < 100f)
-            {
-                behavior = EnemyBehavior.Dead;
-                return true;
-            }
+            //if (Math.Abs(Vector3.Distance(Pos, p.Pos)) < 100f)
+            //{
+            //    behavior = EnemyBehavior.Dead;
+            //    return true;
+            //}
             return false;
         }
     }
