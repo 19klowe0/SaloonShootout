@@ -33,12 +33,6 @@ namespace SaloonShootout
         Model enemy4;
         Model enemy5;
         Model enemy6;
-        Vector3 enemy1Pos;
-        Vector3 enemy2Pos;
-        Vector3 enemy3Pos;
-        Vector3 enemy4Pos;
-        Vector3 enemy5Pos;
-        Vector3 enemy6Pos;
 
         //bullet information 
         //bulletPos will probably need to be array since multiple can be on screen
@@ -47,7 +41,6 @@ namespace SaloonShootout
         List<Projectile> bullets;
         List<Enemy> enemies;
 
-        MeshCollider worldMesh;
 
 
         //mousestate
@@ -75,12 +68,12 @@ namespace SaloonShootout
             playerDir = Vector3.Zero;
 
             //Enemy Positions
-            enemy1Pos = new Vector3(-2000, 150, -3500);
-            enemy2Pos = new Vector3(2000, 150, -3500);
-            enemy3Pos = new Vector3(0, 150, -4500);
-            enemy4Pos = new Vector3(0, 150, -4500);
-            enemy5Pos = new Vector3(250, 150, -3500);
-            enemy6Pos = new Vector3(-250, 150, -3500);
+            //enemy1Pos = new Vector3(-2000, 150, -3500);
+            //enemy2Pos = new Vector3(2000, 150, -3500);
+            //enemy3Pos = new Vector3(0, 150, -4500);
+            //enemy4Pos = new Vector3(0, 150, -4500);
+            //enemy5Pos = new Vector3(250, 150, -3500);
+            //enemy6Pos = new Vector3(-250, 150, -3500);
 
             ////test for bullet
             //bulletPos = new Vector3(0,30,100);
@@ -110,7 +103,7 @@ namespace SaloonShootout
             enemy6 = enemy2;
             bullet = Content.Load<Model>("Bullet");
 
-            //worldMesh = new MeshCollider(enemy1, Matrix.CreateScale(0.004f));
+            
 
             bulletIcon = Content.Load<Texture2D>("BulletIcon");
             gameFont = Content.Load<SpriteFont>("galleryFont");
@@ -163,49 +156,52 @@ namespace SaloonShootout
                 bulletCount = 6;
             }
 
+            //check for collision using vector distance
+            for (int p = 0; p < bullets.Count; p++)
+            {
+                foreach (Enemy e in enemies)
+                {
+                    if (e.CheckProjectile(bullets[p]))
+                    {
+                        bullets[p].Update(gameTime);
+                        bullets.RemoveAt(p);
+                        score++;
+                        --p;
+                        break;
+                    }
+                }
+            }
+
+            //boundingsphere collision 
+            #region 
+            //this is code for the bounding sphere 
             //for (int p = 0; p < bullets.Count; p++)
             //{
-            //    foreach (Enemy e in enemies)
+            //    Projectile b = bullets[p];
+            //    b.Update(gameTime);
+
+            //    foreach(Enemy e in enemies)
             //    {
-            //        if (e.CheckProjectile(bullets[p]))
+            //        b.Update(gameTime);
+            //        if (b.checkCollision(e))
             //        {
-            //            bullets[p].Update(gameTime);
-            //            //bullets.RemoveAt(p);
-            //            score++;
-            //            --p;
-            //            break;
+            //            e.Update(gameTime);
+            //            for (int i = 0; i < bullets.Count; i++)
+            //            {
+            //                e.Update(gameTime);
+
+            //                bullets[i].Update(gameTime);
+            //                bullets.RemoveAt(i);
+            //                score++;
+            //                //--p;
+            //            }
             //        }
             //    }
             //}
 
-            for (int p = 0; p < bullets.Count; p++)
-            {
-                Projectile b = bullets[p];
-                b.Update(gameTime);
-              
-                foreach(Enemy e in enemies)
-                {
-                    b.Update(gameTime);
-                    if (b.checkCollision(e))
-                    {
-                        e.Update(gameTime);
-                        for (int i = 0; i < bullets.Count; i++)
-                        {
-                            e.Update(gameTime);
+            #endregion 
 
-                            bullets[i].Update(gameTime);
-                            bullets.RemoveAt(i);
-                            score++;
-                            //--p;
-                        }
-                    }
-                    
-                }
-
-            }
-
-
-            // update timer
+            //update timer
             timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             base.Update(gameTime);
@@ -225,6 +221,12 @@ namespace SaloonShootout
             //timer and score keeper
             _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(timer).ToString(), new Vector2(10, 10), Color.Black);
             _spriteBatch.DrawString(gameFont, "Score: " + score.ToString(), new Vector2(10, 40), Color.Black);
+
+            foreach (Projectile b in bullets)
+            {
+                _spriteBatch.DrawString(gameFont, "Bullet Position: " + b.Pos.ToString(), new Vector2(10, 60), Color.White);
+            }
+           
 
             //sprite controller for buller icons
             if (bulletCount > 0)
@@ -327,10 +329,12 @@ namespace SaloonShootout
             {
                 if (e.Type == Enemy.EnemyType.enemy1)
                 {
-                    world = Matrix.CreateTranslation(e.Pos)
-                           * Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(e.Rot) 
-                           ;
+                    //was out of order!
+                    world = 
+                           Matrix.CreateScale(0.045f) *
+                           Matrix.CreateRotationY(e.Rot)*
+                           Matrix.CreateTranslation(e.Pos);
+   
 
 
                     foreach (ModelMesh mesh in enemy1.Meshes)
@@ -359,7 +363,6 @@ namespace SaloonShootout
                             }
                         }
                         enemy1.Draw(world, view, proj);
-                        //mesh.Draw();
                     }
                 }
             }

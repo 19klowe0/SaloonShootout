@@ -61,13 +61,15 @@ namespace SaloonShootout
 
             // random pos 
             //pos = new Vector3(rand.Next(-100, 100), 0, rand.Next(-100, 100));
-            pos = new Vector3(-2000, 150, -3500);
+       
+            pos = new Vector3(100,5f,-200);
+
 
             //random rotate
             //rot = MathHelper.ToRadians(rand.Next(0, 360));
-            rot = MathHelper.ToRadians(180);
+            rot = MathHelper.ToRadians(0);
             //behavior = EnemyBehavior.Random;
-            radius = 1000f;
+            radius = 5f;
         }
 
         public void Update(GameTime gameTime)
@@ -108,18 +110,20 @@ namespace SaloonShootout
                 }
             }
         }
-        public BoundingSphere boundingSphere
-        {
-            get { return new BoundingSphere(pos, radius); }
-        }
+
+        //for other collision process
+        //public BoundingSphere boundingSphere
+        //{
+        //    get { return new BoundingSphere(pos, radius); }
+        //}
 
         public bool CheckProjectile(Projectile p)
         {
-            //if (Math.Abs(Vector3.Distance(Pos, p.Pos)) < 100f)
-            //{
-            //    behavior = EnemyBehavior.Dead;
-            //    return true;
-            //}
+            if (Math.Abs(Vector3.Distance(Pos, p.Pos)) < 5f)
+            {
+                behavior = EnemyBehavior.Dead;
+                return true;
+            }
             return false;
         }
     }
