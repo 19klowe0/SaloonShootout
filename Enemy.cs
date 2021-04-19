@@ -14,9 +14,11 @@ namespace SaloonShootout
         Vector3 pos;
         float rot;
         float radius;
+        int hall;
 
 
-        public enum EnemyType { enemy1};
+        public enum EnemyType { enemy1};//the diffrent enemy types (declare more here)
+
         public enum EnemyBehavior { Random, Freeze, Attack, Dead };
 
         public Vector3 Pos
@@ -56,18 +58,52 @@ namespace SaloonShootout
             {
                 rand = new Random();
             }
+
+            //grayson add different types/ randomize it here!
             //random type 
             type = 0;
 
+            //random hall 
+            //hall = rand.Next(0, 5);
+            hall = 2;
+
             // random pos 
             //pos = new Vector3(rand.Next(-100, 100), 0, rand.Next(-100, 100));
-       
-            pos = new Vector3(100,5f,-200);
 
+            //different halls random positions
+            if (hall == 0)
+            {
+                pos = new Vector3(rand.Next(95, 130), 5f, -200);
+                rot = MathHelper.ToRadians(0);
+            }
+            else if (hall == 1)
+            {
+                pos = new Vector3(235 ,5f,rand.Next(-15, 15));
+                rot = MathHelper.ToRadians(270);
+            }
+            else if (hall == 2)
+            {
+                //pos = new Vector3(100, 5f, 200);
+                pos = new Vector3(rand.Next(90, 105), 5f, rand.Next(150, 200));
+                rot = MathHelper.ToRadians(180);
 
-            //random rotate
+            }
+            else if (hall == 3)
+            {
+                pos = new Vector3(100, 5f, -200);
+            }
+            else if (hall == 4)
+            {
+                pos = new Vector3(100, 5f, -200);
+            }
+            else 
+            {
+                pos = new Vector3(-100, 5f, -200);
+            }
+
+           
             //rot = MathHelper.ToRadians(rand.Next(0, 360));
-            rot = MathHelper.ToRadians(0);
+            
             //behavior = EnemyBehavior.Random;
             radius = 5f;
         }

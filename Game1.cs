@@ -24,6 +24,7 @@ namespace SaloonShootout
         Model player;
         Model saloon;
         Vector3 playerDir;
+        float enemyRot;
         float playerRot;
 
         //enemy information
@@ -331,9 +332,9 @@ namespace SaloonShootout
                 {
                     //was out of order!
                     world = 
-                           Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(e.Rot)*
-                           Matrix.CreateTranslation(e.Pos);
+                           Matrix.CreateScale(0.045f) 
+                           *Matrix.CreateRotationY(e.Rot)
+                           *Matrix.CreateTranslation(e.Pos);
    
 
 
@@ -356,7 +357,7 @@ namespace SaloonShootout
                             if (e.Behavior == Enemy.EnemyBehavior.Dead)
                             {
                                 effect.World = Matrix.CreateScale(0.004f)
-                                                * Matrix.CreateRotationY(e.Rot)
+                                                //* Matrix.CreateRotationY(e.Rot)
                                                 * Matrix.CreateRotationX(90)
                                                 * Matrix.CreateTranslation(e.Pos);
                                 effect.DiffuseColor = Color.DarkCyan.ToVector3();
@@ -381,10 +382,10 @@ namespace SaloonShootout
 
             #region
             //Placing all enemies manually
-            world = Matrix.CreateTranslation(enemy1Pos)
-                           * Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(MathHelper.ToRadians(180)) *
-                           Matrix.CreateTranslation(Vector3.Zero);
+            //world = Matrix.CreateTranslation(enemy1Pos)
+            //               * Matrix.CreateScale(0.045f) *
+            //               Matrix.CreateRotationY(MathHelper.ToRadians(180)) *
+            //               Matrix.CreateTranslation(Vector3.Zero);
 
             
             //enable the lighting for the enemy meshes
