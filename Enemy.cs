@@ -15,11 +15,12 @@ namespace SaloonShootout
         float rot;
         float radius;
         int hall;
-
+        Vector3 moveDir;
+       
 
         public enum EnemyType { enemy1};//the diffrent enemy types (declare more here)
 
-        public enum EnemyBehavior { Random, Freeze, Attack, Dead };
+        public enum EnemyBehavior {Freeze, Attack, Dead };
 
         public Vector3 Pos
         {
@@ -64,17 +65,16 @@ namespace SaloonShootout
             type = 0;
 
             //random hall 
-            //hall = rand.Next(0, 5);
-            hall = 2;
+            hall = rand.Next(0, 6);
+            //hall = 4;
 
             // random pos 
-            //pos = new Vector3(rand.Next(-100, 100), 0, rand.Next(-100, 100));
-
             //different halls random positions
             if (hall == 0)
             {
                 pos = new Vector3(rand.Next(95, 130), 5f, -200);
                 rot = MathHelper.ToRadians(0);
+
             }
             else if (hall == 1)
             {
@@ -90,21 +90,23 @@ namespace SaloonShootout
             }
             else if (hall == 3)
             {
-                pos = new Vector3(100, 5f, -200);
+                pos = new Vector3(rand.Next(-130, -100), 5f, 200);
+                rot = MathHelper.ToRadians(150);
             }
             else if (hall == 4)
             {
-                pos = new Vector3(100, 5f, -200);
+                pos = new Vector3(-225, 5f, rand.Next(-15, 15));
+                rot = MathHelper.ToRadians(90);
             }
             else 
             {
-                pos = new Vector3(-100, 5f, -200);
+                pos = new Vector3(rand.Next(-140,-100), 5f, -205);
             }
 
            
             //rot = MathHelper.ToRadians(rand.Next(0, 360));
             
-            //behavior = EnemyBehavior.Random;
+            behavior = EnemyBehavior.Attack;
             radius = 5f;
         }
 
@@ -112,16 +114,17 @@ namespace SaloonShootout
         {
             switch (behavior)
             {
-                case EnemyBehavior.Random:
-                    rot += MathHelper.ToRadians(rand.Next(-3, 3));
-                    pos += Vector3.Transform(Vector3.Backward,
-                                            Matrix.CreateRotationY(rot)) * .2f;
-                    break;
                 case EnemyBehavior.Attack:
-                    pos += Vector3.Transform(
-                    Vector3.Backward, Matrix.CreateRotationY(rot)) * 0.2f;
+                    
+                    //speed of enemy movement
+                    Vector3 velocity = moveDir * .75f;
+                    pos += velocity;
+
                     break;
                 case EnemyBehavior.Freeze:
+                    velocity = moveDir * .2f;
+                    pos += velocity;
+
                     break;
                 default:
                     break;
@@ -129,21 +132,19 @@ namespace SaloonShootout
             }
         }
         public void respondToPlayer(Vector3 playerPos)
-        {
-            if (Vector3.Distance(pos, playerPos) < 3)
+        { 
+            //code for movement
+            moveDir = playerPos - pos;
+            moveDir.Normalize();
+
+            
+            if (Vector3.Distance(playerPos, pos) < 50f)
             {
-                if (behavior != EnemyBehavior.Dead)
-                {
-                    behavior = EnemyBehavior.Freeze;
-                }
+                behavior = EnemyBehavior.Freeze;
             }
-            else if (Vector3.Distance(pos, playerPos) < 5)
+            else if (behavior != EnemyBehavior.Dead)
             {
-                rot = (float)Math.Atan2(playerPos.Z - pos.Z, playerPos.Z - pos.X);
-                if (behavior != EnemyBehavior.Dead)
-                {
-                    behavior = EnemyBehavior.Attack;
-                }
+                behavior = EnemyBehavior.Attack;
             }
         }
 

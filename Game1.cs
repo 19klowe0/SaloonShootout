@@ -17,6 +17,12 @@ namespace SaloonShootout
         float timer;
         int score;
         int bulletCount = 6;
+        TimeSpan enemySpawnTime;
+        TimeSpan previousSpawnTime;
+
+        
+        //enemy temp variable
+        bool enemyaddtemp = true;
 
         //needed player information
         Vector3 playerPos;
@@ -26,6 +32,7 @@ namespace SaloonShootout
         Vector3 playerDir;
         float enemyRot;
         float playerRot;
+         
 
         //enemy information
         Model enemy1;
@@ -68,13 +75,6 @@ namespace SaloonShootout
             camOffset = new Vector3(0, 6, 20);
             playerDir = Vector3.Zero;
 
-            //Enemy Positions
-            //enemy1Pos = new Vector3(-2000, 150, -3500);
-            //enemy2Pos = new Vector3(2000, 150, -3500);
-            //enemy3Pos = new Vector3(0, 150, -4500);
-            //enemy4Pos = new Vector3(0, 150, -4500);
-            //enemy5Pos = new Vector3(250, 150, -3500);
-            //enemy6Pos = new Vector3(-250, 150, -3500);
 
             ////test for bullet
             //bulletPos = new Vector3(0,30,100);
@@ -84,8 +84,18 @@ namespace SaloonShootout
 
 
             enemies = new List<Enemy>();
-            enemies.Add(new Enemy());
-            
+
+            //beginning amount of enemies
+            //for (int e = 0; e<2; e++)
+            //{
+            //    enemies.Add(new Enemy());
+            //}
+
+            //setting up the spawn times
+            previousSpawnTime = TimeSpan.Zero;
+
+            enemySpawnTime = TimeSpan.FromSeconds(5.0f);
+
 
             base.Initialize();
         }
@@ -200,10 +210,43 @@ namespace SaloonShootout
             //    }
             //}
 
-            #endregion 
+            #endregion
+
+            
+            //if ((int)timer % 5.0 == 0 && enemyaddtemp == true)
+            //{
+            //    // addEnemies += 1f;
+            //    enemies.Add(new Enemy());
+            //    enemyaddtemp = false;
+                
+            //}
+
+
+            //call for enemy movement
+            foreach (Enemy e in enemies)
+            {
+                e.respondToPlayer(playerPos);
+                e.Update(gameTime);
+            }
 
             //update timer
             timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //if (timer)
+            //{
+            //    enemyaddtemp = true;
+            //}
+
+            //update method for spawning
+            if (gameTime.TotalGameTime - previousSpawnTime > enemySpawnTime)
+            {
+               
+                previousSpawnTime = gameTime.TotalGameTime;
+                // Add an Enemy
+                enemies.Add(new Enemy());
+
+            }
+
+
 
             base.Update(gameTime);
         }
@@ -220,13 +263,8 @@ namespace SaloonShootout
             GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
 
             //timer and score keeper
-            _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(timer).ToString(), new Vector2(10, 10), Color.Black);
-            _spriteBatch.DrawString(gameFont, "Score: " + score.ToString(), new Vector2(10, 40), Color.Black);
-
-            foreach (Projectile b in bullets)
-            {
-                _spriteBatch.DrawString(gameFont, "Bullet Position: " + b.Pos.ToString(), new Vector2(10, 60), Color.White);
-            }
+            _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(timer).ToString(), new Vector2(10, 10), Color.White);
+            _spriteBatch.DrawString(gameFont, "Score: " + score.ToString(), new Vector2(10, 40), Color.White);
            
 
             //sprite controller for buller icons
@@ -335,9 +373,9 @@ namespace SaloonShootout
                            Matrix.CreateScale(0.045f) 
                            *Matrix.CreateRotationY(e.Rot)
                            *Matrix.CreateTranslation(e.Pos);
-   
 
 
+                    
                     foreach (ModelMesh mesh in enemy1.Meshes)
                     {
                         foreach (BasicEffect effect in mesh.Effects)
@@ -349,19 +387,20 @@ namespace SaloonShootout
                             effect.EnableDefaultLighting();
                             effect.LightingEnabled = true;
                             effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
-
-                            //if (e.Behavior == Enemy.EnemyBehavior.Freeze)
-                            //{
-                            //    effect.DiffuseColor = Color.DarkCyan.ToVector3();
-                            //}
-                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
                             {
-                                effect.World = Matrix.CreateScale(0.004f)
-                                                //* Matrix.CreateRotationY(e.Rot)
-                                                * Matrix.CreateRotationX(90)
-                                                * Matrix.CreateTranslation(e.Pos);
                                 effect.DiffuseColor = Color.DarkCyan.ToVector3();
                             }
+                            else if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            {
+                                effect.World = Matrix.CreateScale(0.045f)
+                                               * Matrix.CreateRotationX(90)
+                                               * Matrix.CreateTranslation(e.Pos);
+                                effect.DiffuseColor = Color.Red.ToVector3();
+                            }
+                            else
+                                effect.DiffuseColor = Color.White.ToVector3();
+
                         }
                         enemy1.Draw(world, view, proj);
                     }
