@@ -11,7 +11,7 @@ namespace SaloonShootout
     {
         private Vector3 pos;
         Vector3 dir;
-        private Vector3 vel; // velocity
+        //private Vector3 vel; // velocity
         private float radius;
 
 

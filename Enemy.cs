@@ -105,9 +105,9 @@ namespace SaloonShootout
 
            
             //rot = MathHelper.ToRadians(rand.Next(0, 360));
-            
-            behavior = EnemyBehavior.Attack;
             radius = 5f;
+            behavior = EnemyBehavior.Attack;
+            
         }
 
         public void Update(GameTime gameTime)
@@ -127,6 +127,7 @@ namespace SaloonShootout
 
                     break;
                 default:
+                    pos += new Vector3(0, 1, 0);
                     break;
 
             }
@@ -137,8 +138,8 @@ namespace SaloonShootout
             moveDir = playerPos - pos;
             moveDir.Normalize();
 
-            
-            if (Vector3.Distance(playerPos, pos) < 50f)
+
+            if (Vector3.Distance(playerPos, pos) < 50f && behavior != EnemyBehavior.Dead)
             {
                 behavior = EnemyBehavior.Freeze;
             }

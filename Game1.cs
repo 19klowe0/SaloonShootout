@@ -227,7 +227,22 @@ namespace SaloonShootout
             {
                 e.respondToPlayer(playerPos);
                 e.Update(gameTime);
+
             }
+//remove enemies not working 
+            foreach (Enemy e in enemies)
+            {
+                //if (e.Pos.Y < 10)
+                //{
+                //    for (int e1 = 0; e1 < enemies.Count; e1++)
+                //    {
+                //        enemies.RemoveAt(e1);
+                //    }
+                //}
+
+            }
+            
+           
 
             //update timer
             timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -245,8 +260,6 @@ namespace SaloonShootout
                 enemies.Add(new Enemy());
 
             }
-
-
 
             base.Update(gameTime);
         }
@@ -391,10 +404,10 @@ namespace SaloonShootout
                             {
                                 effect.DiffuseColor = Color.DarkCyan.ToVector3();
                             }
-                            else if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
                             {
                                 effect.World = Matrix.CreateScale(0.045f)
-                                               * Matrix.CreateRotationX(90)
+                                               * Matrix.CreateRotationY(90)
                                                * Matrix.CreateTranslation(e.Pos);
                                 effect.DiffuseColor = Color.Red.ToVector3();
                             }
