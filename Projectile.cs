@@ -11,7 +11,7 @@ namespace SaloonShootout
     {
         private Vector3 pos;
         Vector3 dir;
-        private Vector3 vel; // velocity
+        //private Vector3 vel; // velocity
         private float radius;
 
 
@@ -29,7 +29,7 @@ namespace SaloonShootout
         {
             pos = p;
             dir = d;
-            vel = Vector3.Zero;
+            //vel = Vector3.Zero;
             radius = r;
         }
         public BoundingSphere boundingSphere
@@ -37,11 +37,11 @@ namespace SaloonShootout
             get { return new BoundingSphere(pos, radius); }
         }
 
-        public Vector3 Vel
-        {
-            get { return vel; }
-            set { vel = value; }
-        }
+        //public Vector3 Vel
+        //{
+        //    get { return vel; }
+        //    set { vel = value; }
+        //}
 
         public void Update(GameTime gameTime)
         {
