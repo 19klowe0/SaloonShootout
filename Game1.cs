@@ -85,12 +85,7 @@ namespace SaloonShootout
 
             enemies = new List<Enemy>();
 
-            //beginning amount of enemies
-            //for (int e = 0; e<2; e++)
-            //{
-            //    enemies.Add(new Enemy());
-            //}
-
+           
             //setting up the spawn times
             previousSpawnTime = TimeSpan.Zero;
 
@@ -213,53 +208,59 @@ namespace SaloonShootout
             #endregion
 
             
-            //if ((int)timer % 5.0 == 0 && enemyaddtemp == true)
-            //{
-            //    // addEnemies += 1f;
-            //    enemies.Add(new Enemy());
-            //    enemyaddtemp = false;
-                
-            //}
 
 
             //call for enemy movement
             foreach (Enemy e in enemies)
             {
                 e.respondToPlayer(playerPos);
-                e.Update(gameTime);
+                e.Update(gameTime);;
 
             }
-//remove enemies not working 
-            foreach (Enemy e in enemies)
+
+            //remove enemies when dead 
+            for (int e1 = 0; e1 < enemies.Count; e1++)
             {
-                //if (e.Pos.Y < 10)
-                //{
-                //    for (int e1 = 0; e1 < enemies.Count; e1++)
-                //    {
-                //        enemies.RemoveAt(e1);
-                //    }
-                //}
-
+                foreach (Enemy e in enemies)
+                {
+                    if (e.Pos.Y > 100f)
+                    {
+                        enemies.RemoveAt(e1);
+                        --e1;
+                        break;
+                    }
+                }
             }
-            
-           
+
+
+
 
             //update timer
             timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            //if (timer)
-            //{
-            //    enemyaddtemp = true;
-            //}
+           
 
             //update method for spawning
             if (gameTime.TotalGameTime - previousSpawnTime > enemySpawnTime)
             {
-               
-                previousSpawnTime = gameTime.TotalGameTime;
+
+                if (gameTime.TotalGameTime > TimeSpan.FromSeconds(20f))
+                {
+                    enemySpawnTime = TimeSpan.FromSeconds(3f);
+                }
+
                 // Add an Enemy
                 enemies.Add(new Enemy());
+                foreach (Enemy e in enemies)
+                {
+                    e.changeVelocity(gameTime);
+                }
+                previousSpawnTime = gameTime.TotalGameTime;
 
             }
+
+
+
+           
 
             base.Update(gameTime);
         }

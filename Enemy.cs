@@ -16,7 +16,8 @@ namespace SaloonShootout
         float radius;
         int hall;
         Vector3 moveDir;
-       
+        Vector3 velocity;
+
 
         public enum EnemyType { enemy1};//the diffrent enemy types (declare more here)
 
@@ -37,6 +38,12 @@ namespace SaloonShootout
         {
             get { return rot; }
             set { rot = value; }
+        }
+
+        public Vector3 Velocity
+        {
+            get { return velocity; }
+            set { velocity = value; }
         }
 
         EnemyType type;
@@ -102,12 +109,14 @@ namespace SaloonShootout
             {
                 pos = new Vector3(rand.Next(-140,-100), 5f, -205);
             }
-
+            
+            
            
             //rot = MathHelper.ToRadians(rand.Next(0, 360));
             radius = 5f;
             behavior = EnemyBehavior.Attack;
             
+
         }
 
         public void Update(GameTime gameTime)
@@ -115,9 +124,6 @@ namespace SaloonShootout
             switch (behavior)
             {
                 case EnemyBehavior.Attack:
-                    
-                    //speed of enemy movement
-                    Vector3 velocity = moveDir * .75f;
                     pos += velocity;
 
                     break;
@@ -147,6 +153,16 @@ namespace SaloonShootout
             {
                 behavior = EnemyBehavior.Attack;
             }
+        }
+        public void changeVelocity(GameTime gameTime)
+        {
+            if (gameTime.TotalGameTime > TimeSpan.FromSeconds(50f))
+            {
+                velocity = moveDir * 2f;
+            }
+            else
+                velocity = moveDir * .75f;
+
         }
 
         //for other collision process
