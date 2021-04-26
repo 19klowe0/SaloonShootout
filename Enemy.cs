@@ -18,10 +18,9 @@ namespace SaloonShootout
         Vector3 moveDir;
         Vector3 velocity;
 
+        public enum EnemyType { enemy1, enemy2, enemy3, enemy4 };//the diffrent enemy types (declare more here)
 
-        public enum EnemyType { enemy1};//the diffrent enemy types (declare more here)
-
-        public enum EnemyBehavior {Freeze, Attack, Dead };
+        public enum EnemyBehavior { Freeze, Attack, Dead };
 
         public Vector3 Pos
         {
@@ -69,7 +68,7 @@ namespace SaloonShootout
 
             //grayson add different types/ randomize it here!
             //random type 
-            type = 0;
+            type = (EnemyType)rand.Next(0, 5);
 
             //random hall 
             hall = rand.Next(0, 6);
@@ -110,13 +109,9 @@ namespace SaloonShootout
                 pos = new Vector3(rand.Next(-140,-100), 5f, -205);
             }
             
-            
-           
             //rot = MathHelper.ToRadians(rand.Next(0, 360));
             radius = 5f;
             behavior = EnemyBehavior.Attack;
-            
-
         }
 
         public void Update(GameTime gameTime)
@@ -135,15 +130,14 @@ namespace SaloonShootout
                 default:
                     pos += new Vector3(0, 1, 0);
                     break;
-
             }
         }
+
         public void respondToPlayer(Vector3 playerPos)
         { 
             //code for movement
             moveDir = playerPos - pos;
             moveDir.Normalize();
-
 
             if (Vector3.Distance(playerPos, pos) < 50f && behavior != EnemyBehavior.Dead)
             {
@@ -154,6 +148,7 @@ namespace SaloonShootout
                 behavior = EnemyBehavior.Attack;
             }
         }
+
         public void changeVelocity(GameTime gameTime)
         {
             if (gameTime.TotalGameTime > TimeSpan.FromSeconds(50f))
@@ -162,7 +157,6 @@ namespace SaloonShootout
             }
             else
                 velocity = moveDir * .75f;
-
         }
 
         //for other collision process
