@@ -296,6 +296,11 @@ namespace SaloonShootout
 
                 }
 
+                if (health == 0)
+                {
+                    endscreen = true;
+                }
+
             }
             else if (mainmenu == true && info == false && endscreen == false)
             {
