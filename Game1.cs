@@ -43,6 +43,7 @@ namespace SaloonShootout
         TimeSpan enemySpawnTime;
         TimeSpan previousSpawnTime;
 
+
         //enemy temp variable
         bool enemyaddtemp = true;
 
@@ -101,7 +102,6 @@ namespace SaloonShootout
 
             //setting up the spawn times
             previousSpawnTime = TimeSpan.Zero;
-
             enemySpawnTime = TimeSpan.FromSeconds(5.0f);
 
             base.Initialize();
@@ -273,6 +273,7 @@ namespace SaloonShootout
 
                     // Add an Enemy
                     enemies.Add(new Enemy());
+
                     foreach (Enemy e in enemies)
                     {
                         e.changeVelocity(gameTime);
@@ -297,13 +298,57 @@ namespace SaloonShootout
 
                 if (mouseRectangle.Intersects(easyRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
                 {
+                    //resetting game play 
+                    timer = 0;
+                    for (int e1 = 0; e1 < enemies.Count; e1++)
+                    {
+                        foreach (Enemy e in enemies)
+                        {
+                            if (e.Pos.Y > 0f)
+                            {
+                                enemies.RemoveAt(e1);
+                                --e1;
+                                break;
+                            }
+                        }
+                    }
+                    gameTime.TotalGameTime = TimeSpan.Zero;
+                    score = 0;
+                    previousSpawnTime = TimeSpan.Zero;
+                    enemySpawnTime = TimeSpan.FromSeconds(5.0f);
+                    playerDir = Vector3.Zero;
+
+
                     gamemode = 1;
                     health = 5;
                     mainmenu = false;
                     mRelease = false;
+
+                    
+
                 }
                 if (mouseRectangle.Intersects(mediumRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
                 {
+                    //resetting game play 
+                    timer = 0;
+                    for (int e1 = 0; e1 < enemies.Count; e1++)
+                    {
+                        foreach (Enemy e in enemies)
+                        {
+                            if (e.Pos.Y > 0f)
+                            {
+                                enemies.RemoveAt(e1);
+                                --e1;
+                                break;
+                            }
+                        }
+                    }
+                    gameTime.TotalGameTime = TimeSpan.Zero;
+                    score = 0;
+                    previousSpawnTime = TimeSpan.Zero;
+                    enemySpawnTime = TimeSpan.FromSeconds(5.0f);
+                    playerDir = Vector3.Zero;
+
                     gamemode = 2;
                     health = 3;
                     mainmenu = false;
@@ -311,6 +356,26 @@ namespace SaloonShootout
                 }
                 if (mouseRectangle.Intersects(hardRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
                 {
+                    //resetting game play 
+                    timer = 0;
+                    for (int e1 = 0; e1 < enemies.Count; e1++)
+                    {
+                        foreach (Enemy e in enemies)
+                        {
+                            if (e.Pos.Y > 0f)
+                            {
+                                enemies.RemoveAt(e1);
+                                --e1;
+                                break;
+                            }
+                        }
+                    }
+                    gameTime.TotalGameTime = TimeSpan.Zero;
+                    score = 0;
+                    previousSpawnTime = TimeSpan.Zero;
+                    enemySpawnTime = TimeSpan.FromSeconds(5.0f);
+                    playerDir = Vector3.Zero;
+
                     gamemode = 3;
                     health = 1;
                     mainmenu = false;
@@ -671,6 +736,7 @@ namespace SaloonShootout
                 //timer and score keeper
                 _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(timer).ToString(), new Vector2(10, 10), Color.White);
                 _spriteBatch.DrawString(gameFont, "Score: " + score.ToString(), new Vector2(10, 40), Color.White);
+                _spriteBatch.DrawString(gameFont, " enemy count:" + enemies.Count, new Vector2(10, 50), Color.White);
 
                 //sprite controller for health
                 if (gamemode == 1 || gamemode == 2 || gamemode == 3)
