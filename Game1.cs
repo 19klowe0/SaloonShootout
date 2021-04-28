@@ -484,13 +484,19 @@ namespace SaloonShootout
                             {
                                 effect.DiffuseColor = Color.DarkCyan.ToVector3();
                             }
-                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            else if (e.Behavior == Enemy.EnemyBehavior.Hurt)
+                            {
+                                effect.DiffuseColor = Color.Crimson.ToVector3();
+
+                            }
+                            else if (e.Behavior == Enemy.EnemyBehavior.Dead)
                             {
                                 effect.World = Matrix.CreateScale(0.045f)
                                                * Matrix.CreateRotationY(90)
                                                * Matrix.CreateTranslation(e.Pos);
                                 effect.DiffuseColor = Color.Red.ToVector3();
                             }
+                            
                             else
                                 effect.DiffuseColor = Color.White.ToVector3();
 
