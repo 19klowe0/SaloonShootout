@@ -637,7 +637,7 @@ namespace SaloonShootout
             {
                 String info1 = "GAMEPLAY";
                 String info2 = "A: Rotate Left";
-                String info3 = "W: Rotate Right";
+                String info3 = "D: Rotate Right";
                 String info4 = "Left-Click: Fire Bullet";
                 String info5 = "Right-Click: Reload";
                 String info6 = "DIFFICULTIES";
