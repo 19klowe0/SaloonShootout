@@ -736,7 +736,6 @@ namespace SaloonShootout
                 //timer and score keeper
                 _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(timer).ToString(), new Vector2(10, 10), Color.White);
                 _spriteBatch.DrawString(gameFont, "Score: " + score.ToString(), new Vector2(10, 40), Color.White);
-                _spriteBatch.DrawString(gameFont, " enemy count:" + enemies.Count, new Vector2(10, 50), Color.White);
 
                 //sprite controller for health
                 if (gamemode == 1 || gamemode == 2 || gamemode == 3)
