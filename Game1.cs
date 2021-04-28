@@ -252,8 +252,11 @@ namespace SaloonShootout
                 foreach (Enemy e in enemies)
                 {
                     e.respondToPlayer(playerPos);
-                    e.Update(gameTime); ;
-
+                    e.Update(gameTime);
+                    if (e.checkWithPlayer(playerPos))
+                    {
+                        health--;
+                    }
                 }
 
                 //remove enemies when dead 
@@ -269,6 +272,8 @@ namespace SaloonShootout
                         }
                     }
                 }
+
+
 
 
 

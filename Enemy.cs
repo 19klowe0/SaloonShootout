@@ -190,5 +190,15 @@ namespace SaloonShootout
             }
             return false;
         }
+
+        public bool checkWithPlayer(Vector3 playerPos)
+        {
+            if (Vector3.Distance(Pos, playerPos) < 5 && Vector3.Distance(Pos, playerPos) > 4.9)
+            {
+                return true;
+            }
+            return false;
+            
+        }
     }
 }
