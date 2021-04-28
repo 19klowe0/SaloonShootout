@@ -21,7 +21,7 @@ namespace SaloonShootout
 
         public enum EnemyType { enemy1};//the diffrent enemy types (declare more here)
 
-        public enum EnemyBehavior {Freeze, Attack, Dead };
+        public enum EnemyBehavior {Freeze, Attack, Dead, Hurt};
 
         public Vector3 Pos
         {
@@ -130,7 +130,9 @@ namespace SaloonShootout
                 case EnemyBehavior.Freeze:
                     velocity = moveDir * .2f;
                     pos += velocity;
-
+                    break;
+                case EnemyBehavior.Hurt:
+                    pos += new Vector3(0, 1, 0);
                     break;
                 default:
                     pos += new Vector3(0, 1, 0);
@@ -145,14 +147,22 @@ namespace SaloonShootout
             moveDir.Normalize();
 
 
-            if (Vector3.Distance(playerPos, pos) < 50f && behavior != EnemyBehavior.Dead)
+            if (Vector3.Distance(playerPos, pos) < 5f && behavior != EnemyBehavior.Dead)
+            {
+                behavior = EnemyBehavior.Hurt;
+            }
+            else if (Vector3.Distance(playerPos, pos) < 50f && behavior != EnemyBehavior.Hurt && behavior != EnemyBehavior.Dead)
             {
                 behavior = EnemyBehavior.Freeze;
+
             }
-            else if (behavior != EnemyBehavior.Dead)
+            else if (behavior != EnemyBehavior.Dead && behavior != EnemyBehavior.Hurt)
             {
                 behavior = EnemyBehavior.Attack;
             }
+            else
+                behavior = EnemyBehavior.Dead;
+            
         }
         public void changeVelocity(GameTime gameTime)
         {
