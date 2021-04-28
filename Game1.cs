@@ -43,7 +43,6 @@ namespace SaloonShootout
         TimeSpan enemySpawnTime;
         TimeSpan previousSpawnTime;
 
-
         //enemy temp variable
         bool enemyaddtemp = true;
 
@@ -56,14 +55,11 @@ namespace SaloonShootout
         float enemyRot;
         float playerRot;
 
-
         //enemy information
         Model enemy1;
         Model enemy2;
         Model enemy3;
         Model enemy4;
-        Model enemy5;
-        Model enemy6;
 
         //bullet information 
         //bulletPos will probably need to be array since multiple can be on screen
@@ -71,8 +67,6 @@ namespace SaloonShootout
 
         List<Projectile> bullets;
         List<Enemy> enemies;
-
-
 
         //mousestate
         MouseState mstate;
@@ -97,22 +91,17 @@ namespace SaloonShootout
             camOffset = new Vector3(0, 6, 20);
             playerDir = Vector3.Zero;
 
-
-            ////test for bullet
+            //test for bullet
             //bulletPos = new Vector3(0,30,100);
 
             bullets = new List<Projectile>();
 
-
-
             enemies = new List<Enemy>();
-
-
+            
             //setting up the spawn times
             previousSpawnTime = TimeSpan.Zero;
 
             enemySpawnTime = TimeSpan.FromSeconds(5.0f);
-
 
             base.Initialize();
         }
@@ -127,8 +116,6 @@ namespace SaloonShootout
             enemy2 = Content.Load<Model>("Cowboy2");
             enemy3 = Content.Load<Model>("Cowboy3");
             enemy4 = Content.Load<Model>("Cowboy4");
-            enemy5 = enemy1;
-            enemy6 = enemy2;
             bullet = Content.Load<Model>("Bullet");
 
             healthfull = Content.Load<Texture2D>("Health_Full");
@@ -155,6 +142,20 @@ namespace SaloonShootout
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            // TODO: Add your update logic here
+            //Felt like it was going too fast, so decreased the speed
+            //rotate to the Right
+            if (Keyboard.GetState().IsKeyDown(Keys.Right) || Keyboard.GetState().IsKeyDown(Keys.D))
+            {
+                playerRot -= .05f;
+            }
+            //rotate to the left
+            if (Keyboard.GetState().IsKeyDown(Keys.Left) || Keyboard.GetState().IsKeyDown(Keys.A))
+            {
+                playerRot += .05f;
+            }
+
+            //mstate controls
             mstate = Mouse.GetState();
 
             if (mainmenu == false && info == false && endscreen == false)
@@ -191,31 +192,6 @@ namespace SaloonShootout
                     bullets[b].Update(gameTime);
                 }
 
-                if (mstate.LeftButton == ButtonState.Released)
-                {
-                    mRelease = true;
-                }
-                if (mstate.RightButton == ButtonState.Pressed)
-                {
-                    bulletCount = 6;
-                }
-
-                //check for collision using vector distance
-                for (int p = 0; p < bullets.Count; p++)
-                {
-                    foreach (Enemy e in enemies)
-                    {
-                        if (e.CheckProjectile(bullets[p]))
-                        {
-                            bullets[p].Update(gameTime);
-                            bullets.RemoveAt(p);
-                            score++;
-                            --p;
-                            break;
-                        }
-                    }
-                }
-
                 //boundingsphere collision 
                 #region 
                 //this is code for the bounding sphere 
@@ -245,8 +221,69 @@ namespace SaloonShootout
 
                 #endregion
 
+                //call for enemy movement
+                foreach (Enemy e in enemies)
+                {
+                    e.respondToPlayer(playerPos);
+                    e.Update(gameTime);;
 
+                }
+            
+                if (mstate.LeftButton == ButtonState.Released)
+                {
+                    mRelease = true;
+                }
+                if (mstate.RightButton == ButtonState.Pressed)
+                {
+                    bulletCount = 6;
+                }
 
+                //check for collision using vector distance
+                for (int p = 0; p < bullets.Count; p++)
+                {
+                    foreach (Enemy e in enemies)
+                    {
+                        if (e.CheckProjectile(bullets[p]))
+                        {
+                            bullets[p].Update(gameTime);
+                            bullets.RemoveAt(p);
+                            score++;
+                            --p;
+                            break;
+                        }
+                    }
+                }
+
+                //update timer
+                timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                //boundingsphere collision 
+                #region 
+                //this is code for the bounding sphere 
+                //for (int p = 0; p < bullets.Count; p++)
+                //{
+                //    Projectile b = bullets[p];
+                //    b.Update(gameTime);
+
+                //    foreach(Enemy e in enemies)
+                //    {
+                //        b.Update(gameTime);
+                //        if (b.checkCollision(e))
+                //        {
+                //            e.Update(gameTime);
+                //            for (int i = 0; i < bullets.Count; i++)
+                //            {
+                //                e.Update(gameTime);
+
+                //                bullets[i].Update(gameTime);
+                //                bullets.RemoveAt(i);
+                //                score++;
+                //                //--p;
+                //            }
+                //        }
+                //    }
+                //}
+
+                #endregion
 
                 //call for enemy movement
                 foreach (Enemy e in enemies)
@@ -272,40 +309,43 @@ namespace SaloonShootout
                         }
                     }
                 }
+            
+                base.Update(gameTime);
+            }
+            //update timer
+            timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            //update method for spawning
+            if (gameTime.TotalGameTime - previousSpawnTime > enemySpawnTime)
+            {
 
-
-
-
-
-                //update timer
-                timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-
-                //update method for spawning
-                if (gameTime.TotalGameTime - previousSpawnTime > enemySpawnTime)
+                if (gameTime.TotalGameTime > TimeSpan.FromSeconds(20f))
                 {
-
-                    if (gameTime.TotalGameTime > TimeSpan.FromSeconds(20f))
-                    {
-                        enemySpawnTime = TimeSpan.FromSeconds(3f);
-                    }
-
-                    // Add an Enemy
-                    enemies.Add(new Enemy());
-                    foreach (Enemy e in enemies)
-                    {
-                        e.changeVelocity(gameTime);
-                    }
-                    previousSpawnTime = gameTime.TotalGameTime;
-
+                    enemySpawnTime = TimeSpan.FromSeconds(3f);
                 }
 
-                if (health == 0)
+                // Add an Enemy
+                enemies.Add(new Enemy());
+                foreach (Enemy e in enemies)
                 {
-                    endscreen = true;
+                    e.changeVelocity(gameTime);
                 }
+                previousSpawnTime = gameTime.TotalGameTime;
 
+            }
+
+            if (health == 0)
+            {
+                endscreen = true;
+            }
+
+            //timer and score keeper
+            _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(timer).ToString(), new Vector2(10, 10), Color.White);
+            _spriteBatch.DrawString(gameFont, "Score: " + score.ToString(), new Vector2(10, 40), Color.White);
+           
+            //sprite controller for buller icons
+            if (bulletCount > 0){
+            
             }
             else if (mainmenu == true && info == false && endscreen == false)
             {
@@ -413,8 +453,6 @@ namespace SaloonShootout
                            Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
                            Matrix.CreateTranslation(Vector3.Zero);
 
-
-
             //enable the lighting for the gun meshes
             foreach (ModelMesh mesh in player.Meshes)
             {
@@ -459,8 +497,7 @@ namespace SaloonShootout
                     effect.LightingEnabled = true;
                 }
             }
-
-
+          
             //draw enemies 
             foreach (Enemy e in enemies)
             {
@@ -471,8 +508,6 @@ namespace SaloonShootout
                            Matrix.CreateScale(0.045f)
                            * Matrix.CreateRotationY(e.Rot)
                            * Matrix.CreateTranslation(e.Pos);
-
-
 
                     foreach (ModelMesh mesh in enemy1.Meshes)
                     {
@@ -509,6 +544,120 @@ namespace SaloonShootout
                         enemy1.Draw(world, view, proj);
                     }
                 }
+
+                else if (e.Type == Enemy.EnemyType.enemy2)
+                {
+                    //was out of order!
+                    world =
+                           Matrix.CreateScale(0.045f)
+                           * Matrix.CreateRotationY(e.Rot)
+                           * Matrix.CreateTranslation(e.Pos);
+
+                    foreach (ModelMesh mesh in enemy2.Meshes)
+                    {
+                        foreach (BasicEffect effect in mesh.Effects)
+                        {
+                            effect.World = world;
+                            effect.View = view;
+                            effect.Projection = proj;
+
+                            effect.EnableDefaultLighting();
+                            effect.LightingEnabled = true;
+                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                            {
+                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                            }
+                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            {
+                                effect.World = Matrix.CreateScale(0.045f)
+                                               * Matrix.CreateRotationY(90)
+                                               * Matrix.CreateTranslation(e.Pos);
+                                effect.DiffuseColor = Color.Red.ToVector3();
+                            }
+                            else
+                                effect.DiffuseColor = Color.White.ToVector3();
+
+                        }
+                        enemy2.Draw(world, view, proj);
+                    }
+                }
+
+                else if (e.Type == Enemy.EnemyType.enemy3)
+                {
+                    //was out of order!
+                    world =
+                           Matrix.CreateScale(0.045f)
+                           * Matrix.CreateRotationY(e.Rot)
+                           * Matrix.CreateTranslation(e.Pos);
+
+                    foreach (ModelMesh mesh in enemy3.Meshes)
+                    {
+                        foreach (BasicEffect effect in mesh.Effects)
+                        {
+                            effect.World = world;
+                            effect.View = view;
+                            effect.Projection = proj;
+
+                            effect.EnableDefaultLighting();
+                            effect.LightingEnabled = true;
+                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                            {
+                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                            }
+                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            {
+                                effect.World = Matrix.CreateScale(0.045f)
+                                               * Matrix.CreateRotationY(90)
+                                               * Matrix.CreateTranslation(e.Pos);
+                                effect.DiffuseColor = Color.Red.ToVector3();
+                            }
+                            else
+                                effect.DiffuseColor = Color.White.ToVector3();
+
+                        }
+                        enemy3.Draw(world, view, proj);
+                    }
+                }
+
+                else if (e.Type == Enemy.EnemyType.enemy4)
+                {
+                    //was out of order!
+                    world =
+                           Matrix.CreateScale(0.045f)
+                           * Matrix.CreateRotationY(e.Rot)
+                           * Matrix.CreateTranslation(e.Pos);
+
+                    foreach (ModelMesh mesh in enemy4.Meshes)
+                    {
+                        foreach (BasicEffect effect in mesh.Effects)
+                        {
+                            effect.World = world;
+                            effect.View = view;
+                            effect.Projection = proj;
+
+                            effect.EnableDefaultLighting();
+                            effect.LightingEnabled = true;
+                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                            {
+                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                            }
+                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            {
+                                effect.World = Matrix.CreateScale(0.045f)
+                                               * Matrix.CreateRotationY(90)
+                                               * Matrix.CreateTranslation(e.Pos);
+                                effect.DiffuseColor = Color.Red.ToVector3();
+                            }
+                            else
+                                effect.DiffuseColor = Color.White.ToVector3();
+
+                        }
+                        enemy4.Draw(world, view, proj);
+                    }
+                }
             }
 
             //Draw Bullets
@@ -518,7 +667,6 @@ namespace SaloonShootout
                     * Matrix.CreateRotationY(MathHelper.ToRadians(270))
                     * Matrix.CreateScale(0.05f)
                     * Matrix.CreateTranslation(b.Pos);
-
 
                 bullet.Draw(world, view, proj);
             }
