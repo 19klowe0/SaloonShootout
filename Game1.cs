@@ -298,18 +298,21 @@ namespace SaloonShootout
                 if (mouseRectangle.Intersects(easyRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
                 {
                     gamemode = 1;
+                    health = 5;
                     mainmenu = false;
                     mRelease = false;
                 }
                 if (mouseRectangle.Intersects(mediumRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
                 {
                     gamemode = 2;
+                    health = 3;
                     mainmenu = false;
                     mRelease = false;
                 }
                 if (mouseRectangle.Intersects(hardRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
                 {
                     gamemode = 3;
+                    health = 1;
                     mainmenu = false;
                     mRelease = false;
                 }
@@ -672,23 +675,23 @@ namespace SaloonShootout
                 //sprite controller for health
                 if (gamemode == 1 || gamemode == 2 || gamemode == 3)
                 {
-                    if (health == 5)
+                    if (health == 5 || (health == 3 && gamemode == 2) || (health == 1 && gamemode == 3))
                     {
                         _spriteBatch.Draw(healthfull, new Vector2(300, 10), Color.White);
                     }
-                    if (health == 4 && (gamemode != 2 || gamemode != 3))
+                    if (health == 4)
                     {
                         _spriteBatch.Draw(health4_5, new Vector2(300, 10), Color.White);
                     }
-                    if (health == 3 && (gamemode != 3))
+                    if ((health == 3 && gamemode == 1) || (health == 2 && gamemode == 2))
                     {
                         _spriteBatch.Draw(health3_5, new Vector2(300, 10), Color.White);
                     }
-                    if (health == 2 && (gamemode != 2 || gamemode != 3))
+                    if (health == 2 && gamemode != 2)
                     {
                         _spriteBatch.Draw(health2_5, new Vector2(300, 10), Color.White);
                     }
-                    if (health == 1 && (gamemode != 3))
+                    if (health == 1 && gamemode != 3)
                     {
                         _spriteBatch.Draw(health1_5, new Vector2(300, 10), Color.White);
                     }
