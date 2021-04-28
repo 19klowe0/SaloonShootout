@@ -20,7 +20,7 @@ namespace SaloonShootout
 
         public enum EnemyType { enemy1, enemy2, enemy3, enemy4 };//the diffrent enemy types (declare more here)
 
-        public enum EnemyBehavior { Freeze, Attack, Dead };
+        public enum EnemyBehavior {Freeze, Attack, Dead, Hurt};
 
         public Vector3 Pos
         {
@@ -125,7 +125,9 @@ namespace SaloonShootout
                 case EnemyBehavior.Freeze:
                     velocity = moveDir * .2f;
                     pos += velocity;
-
+                    break;
+                case EnemyBehavior.Hurt:
+                    pos += new Vector3(0, 1, 0);
                     break;
                 default:
                     pos += new Vector3(0, 1, 0);
@@ -139,14 +141,22 @@ namespace SaloonShootout
             moveDir = playerPos - pos;
             moveDir.Normalize();
 
-            if (Vector3.Distance(playerPos, pos) < 50f && behavior != EnemyBehavior.Dead)
+            if (Vector3.Distance(playerPos, pos) < 5f && behavior != EnemyBehavior.Dead)
+            {
+                behavior = EnemyBehavior.Hurt;
+            }
+            else if (Vector3.Distance(playerPos, pos) < 50f && behavior != EnemyBehavior.Hurt && behavior != EnemyBehavior.Dead)
             {
                 behavior = EnemyBehavior.Freeze;
+
             }
-            else if (behavior != EnemyBehavior.Dead)
+            else if (behavior != EnemyBehavior.Dead && behavior != EnemyBehavior.Hurt)
             {
                 behavior = EnemyBehavior.Attack;
             }
+            else
+                behavior = EnemyBehavior.Dead;
+            
         }
 
         public void changeVelocity(GameTime gameTime)
@@ -173,6 +183,16 @@ namespace SaloonShootout
                 return true;
             }
             return false;
+        }
+
+        public bool checkWithPlayer(Vector3 playerPos)
+        {
+            if (Vector3.Distance(Pos, playerPos) < 5 && Vector3.Distance(Pos, playerPos) > 4.9)
+            {
+                return true;
+            }
+            return false;
+            
         }
     }
 }
