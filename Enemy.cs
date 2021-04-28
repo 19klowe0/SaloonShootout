@@ -19,7 +19,7 @@ namespace SaloonShootout
         Vector3 velocity;
 
 
-        public enum EnemyType { enemy1};//the diffrent enemy types (declare more here)
+        public enum EnemyType { enemy1, enemy2, enemy3, enemy4 };//the diffrent enemy types (declare more here)
 
         public enum EnemyBehavior {Freeze, Attack, Dead, Hurt};
 
@@ -69,7 +69,7 @@ namespace SaloonShootout
 
             //grayson add different types/ randomize it here!
             //random type 
-            type = 0;
+            type = (EnemyType)rand.Next(0, 5);
 
             //random hall 
             hall = rand.Next(0, 6);

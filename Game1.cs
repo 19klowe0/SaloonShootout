@@ -43,7 +43,6 @@ namespace SaloonShootout
         TimeSpan enemySpawnTime;
         TimeSpan previousSpawnTime;
 
-
         //enemy temp variable
         bool enemyaddtemp = true;
 
@@ -56,14 +55,11 @@ namespace SaloonShootout
         float enemyRot;
         float playerRot;
 
-
         //enemy information
         Model enemy1;
         Model enemy2;
         Model enemy3;
         Model enemy4;
-        Model enemy5;
-        Model enemy6;
 
         //bullet information 
         //bulletPos will probably need to be array since multiple can be on screen
@@ -71,8 +67,6 @@ namespace SaloonShootout
 
         List<Projectile> bullets;
         List<Enemy> enemies;
-
-
 
         //mousestate
         MouseState mstate;
@@ -103,16 +97,12 @@ namespace SaloonShootout
 
             bullets = new List<Projectile>();
 
-
-
             enemies = new List<Enemy>();
-
 
             //setting up the spawn times
             previousSpawnTime = TimeSpan.Zero;
 
             enemySpawnTime = TimeSpan.FromSeconds(5.0f);
-
 
             base.Initialize();
         }
@@ -127,8 +117,6 @@ namespace SaloonShootout
             enemy2 = Content.Load<Model>("Cowboy2");
             enemy3 = Content.Load<Model>("Cowboy3");
             enemy4 = Content.Load<Model>("Cowboy4");
-            enemy5 = enemy1;
-            enemy6 = enemy2;
             bullet = Content.Load<Model>("Bullet");
 
             healthfull = Content.Load<Texture2D>("Health_Full");
@@ -163,12 +151,12 @@ namespace SaloonShootout
                 // TODO: Add your update logic here
                 //Felt like it was going too fast, so decreased the speed
                 //rotate to the Right
-                if (Keyboard.GetState().IsKeyDown(Keys.Right))
+                if (Keyboard.GetState().IsKeyDown(Keys.Right) || Keyboard.GetState().IsKeyDown(Keys.D))
                 {
                     playerRot -= .05f;
                 }
                 //rotate to the left
-                if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                if (Keyboard.GetState().IsKeyDown(Keys.Left) || Keyboard.GetState().IsKeyDown(Keys.A))
                 {
                     playerRot += .05f;
                 }
@@ -245,9 +233,6 @@ namespace SaloonShootout
 
                 #endregion
 
-
-
-
                 //call for enemy movement
                 foreach (Enemy e in enemies)
                 {
@@ -272,11 +257,6 @@ namespace SaloonShootout
                         }
                     }
                 }
-
-
-
-
-
 
                 //update timer
                 timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -413,8 +393,6 @@ namespace SaloonShootout
                            Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
                            Matrix.CreateTranslation(Vector3.Zero);
 
-
-
             //enable the lighting for the gun meshes
             foreach (ModelMesh mesh in player.Meshes)
             {
@@ -460,7 +438,6 @@ namespace SaloonShootout
                 }
             }
 
-
             //draw enemies 
             foreach (Enemy e in enemies)
             {
@@ -471,8 +448,6 @@ namespace SaloonShootout
                            Matrix.CreateScale(0.045f)
                            * Matrix.CreateRotationY(e.Rot)
                            * Matrix.CreateTranslation(e.Pos);
-
-
 
                     foreach (ModelMesh mesh in enemy1.Meshes)
                     {
@@ -501,12 +476,126 @@ namespace SaloonShootout
                                                * Matrix.CreateTranslation(e.Pos);
                                 effect.DiffuseColor = Color.Red.ToVector3();
                             }
-                            
+
                             else
                                 effect.DiffuseColor = Color.White.ToVector3();
 
                         }
                         enemy1.Draw(world, view, proj);
+                    }
+                }
+
+                else if (e.Type == Enemy.EnemyType.enemy2)
+                {
+                    //was out of order!
+                    world =
+                           Matrix.CreateScale(0.045f)
+                           * Matrix.CreateRotationY(e.Rot)
+                           * Matrix.CreateTranslation(e.Pos);
+
+                    foreach (ModelMesh mesh in enemy2.Meshes)
+                    {
+                        foreach (BasicEffect effect in mesh.Effects)
+                        {
+                            effect.World = world;
+                            effect.View = view;
+                            effect.Projection = proj;
+
+                            effect.EnableDefaultLighting();
+                            effect.LightingEnabled = true;
+                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                            {
+                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                            }
+                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            {
+                                effect.World = Matrix.CreateScale(0.045f)
+                                               * Matrix.CreateRotationY(90)
+                                               * Matrix.CreateTranslation(e.Pos);
+                                effect.DiffuseColor = Color.Red.ToVector3();
+                            }
+                            else
+                                effect.DiffuseColor = Color.White.ToVector3();
+
+                        }
+                        enemy2.Draw(world, view, proj);
+                    }
+                }
+
+                else if (e.Type == Enemy.EnemyType.enemy3)
+                {
+                    //was out of order!
+                    world =
+                           Matrix.CreateScale(0.045f)
+                           * Matrix.CreateRotationY(e.Rot)
+                           * Matrix.CreateTranslation(e.Pos);
+
+                    foreach (ModelMesh mesh in enemy3.Meshes)
+                    {
+                        foreach (BasicEffect effect in mesh.Effects)
+                        {
+                            effect.World = world;
+                            effect.View = view;
+                            effect.Projection = proj;
+
+                            effect.EnableDefaultLighting();
+                            effect.LightingEnabled = true;
+                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                            {
+                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                            }
+                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            {
+                                effect.World = Matrix.CreateScale(0.045f)
+                                               * Matrix.CreateRotationY(90)
+                                               * Matrix.CreateTranslation(e.Pos);
+                                effect.DiffuseColor = Color.Red.ToVector3();
+                            }
+                            else
+                                effect.DiffuseColor = Color.White.ToVector3();
+
+                        }
+                        enemy3.Draw(world, view, proj);
+                    }
+                }
+
+                else if (e.Type == Enemy.EnemyType.enemy4)
+                {
+                    //was out of order!
+                    world =
+                           Matrix.CreateScale(0.045f)
+                           * Matrix.CreateRotationY(e.Rot)
+                           * Matrix.CreateTranslation(e.Pos);
+
+                    foreach (ModelMesh mesh in enemy4.Meshes)
+                    {
+                        foreach (BasicEffect effect in mesh.Effects)
+                        {
+                            effect.World = world;
+                            effect.View = view;
+                            effect.Projection = proj;
+
+                            effect.EnableDefaultLighting();
+                            effect.LightingEnabled = true;
+                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                            {
+                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                            }
+                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                            {
+                                effect.World = Matrix.CreateScale(0.045f)
+                                               * Matrix.CreateRotationY(90)
+                                               * Matrix.CreateTranslation(e.Pos);
+                                effect.DiffuseColor = Color.Red.ToVector3();
+                            }
+                            else
+                                effect.DiffuseColor = Color.White.ToVector3();
+
+                        }
+                        enemy4.Draw(world, view, proj);
                     }
                 }
             }
