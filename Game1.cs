@@ -38,14 +38,12 @@ namespace SaloonShootout
         Texture2D bulletIcon;
         SpriteFont gameFont;
         float timer;
-        float reloadTimer;
         int score;
         int bulletCount = 6;
         TimeSpan enemySpawnTime;
         TimeSpan previousSpawnTime;
 
-        //enemy temp variable
-        bool enemyaddtemp = true;
+
 
         //needed player information
         Vector3 playerPos;
@@ -53,7 +51,6 @@ namespace SaloonShootout
         Model player;
         Model saloon;
         Vector3 playerDir;
-        float enemyRot;
         float playerRot;
 
         //enemy information
@@ -72,10 +69,14 @@ namespace SaloonShootout
         //mousestate
         MouseState mstate;
         bool mRelease = true;
+        bool rRelease = true;
 
         //for different camera view for testing
         Vector3 camOffset;
 
+        //reload delay 
+        TimeSpan reloadInterval = TimeSpan.FromSeconds(1);
+        TimeSpan lastReload;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -138,7 +139,7 @@ namespace SaloonShootout
 
             // TODO: use this.Content to load your game content here
         }
-
+        
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -184,18 +185,25 @@ namespace SaloonShootout
                 {
                     mRelease = true;
                 }
-                if (mstate.RightButton == ButtonState.Pressed)
+                if (mstate.RightButton == ButtonState.Released)
                 {
-                    reloadTimer = (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    while (bulletCount < 6)
-                    {
-                        if ((float)gameTime.ElapsedGameTime.TotalSeconds == (reloadTimer + 1))
-                        {
-                            bulletCount++;
-                            reloadTimer = (float)gameTime.ElapsedGameTime.TotalSeconds;
-                        }
-                    }
+                    rRelease = true;
                 }
+
+                //reload penalty
+                if (mstate.RightButton == ButtonState.Pressed && rRelease == true && bulletCount < 6)
+                {
+                    if (lastReload + reloadInterval < gameTime.TotalGameTime)
+                    {
+                        bulletCount++;
+                        lastReload = gameTime.TotalGameTime;
+                    }
+                    rRelease = false;
+                }
+
+
+
+
 
                 //check for collision using vector distance
                 for (int p = 0; p < bullets.Count; p++)
