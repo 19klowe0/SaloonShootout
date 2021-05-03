@@ -199,7 +199,7 @@ namespace SaloonShootout
                 {
                     if (lastReload + reloadInterval < gameTime.TotalGameTime)
                     {
-                        bulletCount++;
+                        bulletCount = 6;
                         lastReload = gameTime.TotalGameTime;
                         reload.Play();
                     }
