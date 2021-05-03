@@ -49,17 +49,12 @@ namespace SaloonShootout
         TimeSpan enemySpawnTime;
         TimeSpan previousSpawnTime;
 
-
-        //enemy temp variable
-        bool enemyaddtemp = true;
-
         //needed player information
         Vector3 playerPos;
         Vector3 saloonPos;
         Model player;
         Model saloon;
         Vector3 playerDir;
-        float enemyRot;
         float playerRot;
 
         //enemy information
@@ -78,7 +73,11 @@ namespace SaloonShootout
         //mousestate
         MouseState mstate;
         bool mRelease = true;
-        bool mRelaseRight = true;
+        bool mReleaseRight = true;
+
+        //timespans for reload
+        TimeSpan reloadInterval = TimeSpan.FromSeconds(1);
+        TimeSpan lastReload;
 
         //for different camera view for testing
         Vector3 camOffset;
@@ -196,15 +195,19 @@ namespace SaloonShootout
                 {
                     mRelease = true;
                 }
-                if (mstate.RightButton == ButtonState.Pressed && mRelaseRight == true)
+                if (mstate.RightButton == ButtonState.Pressed && mReleaseRight == true && bulletCount < 6)
                 {
-                    reload.Play();
-                    bulletCount = 6;
-                    mRelaseRight = false;
+                    if (lastReload + reloadInterval < gameTime.TotalGameTime)
+                    {
+                        bulletCount++;
+                        lastReload = gameTime.TotalGameTime;
+                        reload.Play();
+                    }
+                    mReleaseRight = false;
                 }
                 if (mstate.RightButton == ButtonState.Released)
                 {
-                    mRelaseRight = true;
+                    mReleaseRight = true;
                 }
 
                 //check for collision using vector distance
