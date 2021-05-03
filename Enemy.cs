@@ -16,11 +16,12 @@ namespace SaloonShootout
         float radius;
         int hall;
         Vector3 moveDir;
-       
+        Vector3 velocity;
 
-        public enum EnemyType { enemy1};//the diffrent enemy types (declare more here)
 
-        public enum EnemyBehavior {Freeze, Attack, Dead };
+        public enum EnemyType { enemy1, enemy2, enemy3, enemy4 };//the diffrent enemy types (declare more here)
+
+        public enum EnemyBehavior {Freeze, Attack, Dead, Hurt};
 
         public Vector3 Pos
         {
@@ -37,6 +38,12 @@ namespace SaloonShootout
         {
             get { return rot; }
             set { rot = value; }
+        }
+
+        public Vector3 Velocity
+        {
+            get { return velocity; }
+            set { velocity = value; }
         }
 
         EnemyType type;
@@ -62,7 +69,7 @@ namespace SaloonShootout
 
             //grayson add different types/ randomize it here!
             //random type 
-            type = 0;
+            type = (EnemyType)rand.Next(0, 4);
 
             //random hall 
             hall = rand.Next(0, 6);
@@ -102,12 +109,14 @@ namespace SaloonShootout
             {
                 pos = new Vector3(rand.Next(-140,-100), 5f, -205);
             }
-
+            
+            
            
             //rot = MathHelper.ToRadians(rand.Next(0, 360));
             radius = 5f;
             behavior = EnemyBehavior.Attack;
             
+
         }
 
         public void Update(GameTime gameTime)
@@ -115,16 +124,15 @@ namespace SaloonShootout
             switch (behavior)
             {
                 case EnemyBehavior.Attack:
-                    
-                    //speed of enemy movement
-                    Vector3 velocity = moveDir * .75f;
                     pos += velocity;
 
                     break;
                 case EnemyBehavior.Freeze:
                     velocity = moveDir * .2f;
                     pos += velocity;
-
+                    break;
+                case EnemyBehavior.Hurt:
+                    pos += new Vector3(0, 1, 0);
                     break;
                 default:
                     pos += new Vector3(0, 1, 0);
@@ -139,14 +147,32 @@ namespace SaloonShootout
             moveDir.Normalize();
 
 
-            if (Vector3.Distance(playerPos, pos) < 50f && behavior != EnemyBehavior.Dead)
+            if (Vector3.Distance(playerPos, pos) < 5f && behavior != EnemyBehavior.Dead)
+            {
+                behavior = EnemyBehavior.Hurt;
+            }
+            else if (Vector3.Distance(playerPos, pos) < 50f && behavior != EnemyBehavior.Hurt && behavior != EnemyBehavior.Dead)
             {
                 behavior = EnemyBehavior.Freeze;
+
             }
-            else if (behavior != EnemyBehavior.Dead)
+            else if (behavior != EnemyBehavior.Dead && behavior != EnemyBehavior.Hurt)
             {
                 behavior = EnemyBehavior.Attack;
             }
+            else
+                behavior = EnemyBehavior.Dead;
+            
+        }
+        public void changeVelocity(GameTime gameTime)
+        {
+            if (gameTime.TotalGameTime > TimeSpan.FromSeconds(50f))
+            {
+                velocity = moveDir * 2f;
+            }
+            else
+                velocity = moveDir * .75f;
+
         }
 
         //for other collision process
@@ -163,6 +189,16 @@ namespace SaloonShootout
                 return true;
             }
             return false;
+        }
+
+        public bool checkWithPlayer(Vector3 playerPos)
+        {
+            if (Vector3.Distance(Pos, playerPos) < 5 && Vector3.Distance(Pos, playerPos) > 4.8)
+            {
+                return true;
+            }
+            return false;
+            
         }
     }
 }
