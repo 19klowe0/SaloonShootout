@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -49,17 +49,12 @@ namespace SaloonShootout
         TimeSpan enemySpawnTime;
         TimeSpan previousSpawnTime;
 
-
-        //enemy temp variable
-        bool enemyaddtemp = true;
-
         //needed player information
         Vector3 playerPos;
         Vector3 saloonPos;
         Model player;
         Model saloon;
         Vector3 playerDir;
-        float enemyRot;
         float playerRot;
 
         //enemy information
@@ -78,11 +73,15 @@ namespace SaloonShootout
         //mousestate
         MouseState mstate;
         bool mRelease = true;
-        bool mRelaseRight = true;
+        bool rRelease = true;
+
 
         //for different camera view for testing
         Vector3 camOffset;
 
+        //reload delay 
+        TimeSpan reloadInterval = TimeSpan.FromSeconds(1);
+        TimeSpan lastReload;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -149,7 +148,7 @@ namespace SaloonShootout
 
             // TODO: use this.Content to load your game content here
         }
-
+        
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -196,6 +195,21 @@ namespace SaloonShootout
                 {
                     mRelease = true;
                 }
+
+                if (mstate.RightButton == ButtonState.Released)
+                {
+                    rRelease = true;
+                }
+
+                //reload penalty
+                if (mstate.RightButton == ButtonState.Pressed && rRelease == true && bulletCount < 6)
+                {
+                        if (lastReload + reloadInterval < gameTime.TotalGameTime)
+                        {
+                            bulletCount++;
+                            lastReload = gameTime.TotalGameTime;
+                        }
+                    rRelease = false;
                 if (mstate.RightButton == ButtonState.Pressed && mRelaseRight == true)
                 {
                     reload.Play();
@@ -308,6 +322,7 @@ namespace SaloonShootout
                     endscreen = true;
                 }
 
+
             }
             else if (mainmenu == true && info == false && endscreen == false)
             {
@@ -375,8 +390,43 @@ namespace SaloonShootout
                     mainmenu = false;
                     mRelease = false;
                 }
-                if (mouseRectangle.Intersects(hardRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+                else if (mainmenu == true && info == false && endscreen == false)
                 {
+
+                    Rectangle mouseRectangle = new Rectangle(mstate.X, mstate.Y, 1, 1);
+                    Rectangle easyRectangle = new Rectangle(200, 225, 100, 46);
+                    Rectangle mediumRectangle = new Rectangle(350, 225, 100, 46);
+                    Rectangle hardRectangle = new Rectangle(500, 225, 100, 46);
+                    Rectangle infoRectangle = new Rectangle(350, 325, 100, 46);
+
+                    if (mouseRectangle.Intersects(easyRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+                    {
+                        gamemode = 1;
+                        mainmenu = false;
+                        mRelease = false;
+                    }
+                    if (mouseRectangle.Intersects(mediumRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+                    {
+                        gamemode = 2;
+                        mainmenu = false;
+                        mRelease = false;
+                    }
+                    if (mouseRectangle.Intersects(hardRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+                    {
+                        gamemode = 3;
+                        mainmenu = false;
+                        mRelease = false;
+                    }
+                    if (mouseRectangle.Intersects(infoRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+                    {
+                        info = true;
+                        mainmenu = false;
+                        mRelease = false;
+                    }
+                    if (mstate.LeftButton == ButtonState.Released)
+                    {
+                        mRelease = true;
+                    }
                     //resetting game play 
                     timer = 0;
                     for (int e1 = 0; e1 < enemies.Count; e1++)
@@ -412,294 +462,299 @@ namespace SaloonShootout
                 {
                     mRelease = true;
                 }
-            }
-            else if (mainmenu == false && info == true && endscreen == false)
-            {
-                Rectangle mouseRectangle = new Rectangle(mstate.X, mstate.Y, 1, 1);
-                Rectangle mainmenuRectangle = new Rectangle(350, 325, 100, 46);
-                if (mouseRectangle.Intersects(mainmenuRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+                else if (mainmenu == false && info == true && endscreen == false)
                 {
-                    info = false;
-                    mainmenu = true;
-                    mRelease = false;
-                }
-                if (mstate.LeftButton == ButtonState.Released)
-                {
-                    mRelease = true;
-                }
-            }
-            else if (mainmenu == false && info == false && endscreen == true)
-            {
-                Rectangle mouseRectangle = new Rectangle(mstate.X, mstate.Y, 1, 1);
-                Rectangle mainmenuRectangle = new Rectangle(350, 325, 100, 46);
-                if (mouseRectangle.Intersects(mainmenuRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
-                {
-                    mainmenu = true;
-                    endscreen = false;
-                    mRelease = false;
-                }
-                if (mstate.LeftButton == ButtonState.Released)
-                {
-                    mRelease = true;
-                }
-            }
-
-            base.Update(gameTime);
-        }
-
-        void CreateEnvir()
-        {
-            //increased the far cipping plane
-            Matrix proj = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60),
-                                                        (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight,
-                                                        .001f,
-                                                        1000f);
-
-            //code for rotation
-            Matrix view = Matrix.CreateLookAt(
-                Vector3.Transform(camOffset, Matrix.CreateRotationY(playerRot)),
-                new Vector3(0, 0, 0),
-                Vector3.Up);
-
-            //in the distance camera 
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
-                view = Matrix.CreateLookAt(new Vector3(0 + playerPos.X, 10, 30),
-                                         new Vector3(playerPos.X, 0, 0),
-                                         Vector3.Up); //(0,1,0)
-            }
-
-            //matrix world for gun
-            Matrix world = Matrix.CreateRotationY(playerRot)
-                                              * Matrix.CreateTranslation(playerPos)
-                                              * Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(MathHelper.ToRadians(90));
-
-            //matrix world for saloon
-            Matrix environment = Matrix.CreateRotationY(0)
-                                              * Matrix.CreateTranslation(saloonPos)
-                                              * Matrix.CreateScale(0.045f) *
-                           Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
-                           Matrix.CreateTranslation(Vector3.Zero);
-
-            //enable the lighting for the gun meshes
-            foreach (ModelMesh mesh in player.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.World = world;
-                    effect.View = view;
-                    effect.Projection = proj;
-
-                    effect.EnableDefaultLighting();
-                    effect.LightingEnabled = true;
-                }
-            }
-
-            //enable the lighting for the saloon meshes
-            foreach (ModelMesh mesh in saloon.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.World = world;
-                    effect.View = view;
-                    effect.Projection = proj;
-
-                    effect.EnableDefaultLighting();
-                    effect.LightingEnabled = true;
-                }
-            }
-
-            player.Draw(world, view, proj);
-            saloon.Draw(environment, view, proj);
-
-            //enable the lighting for the bullet meshes
-            foreach (ModelMesh mesh in bullet.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.World = world;
-                    effect.View = view;
-                    effect.Projection = proj;
-
-                    effect.EnableDefaultLighting();
-                    effect.LightingEnabled = true;
-                }
-            }
-
-            //draw enemies 
-            foreach (Enemy e in enemies)
-            {
-                if (e.Type == Enemy.EnemyType.enemy1)
-                {
-                    //was out of order!
-                    world =
-                           Matrix.CreateScale(0.045f)
-                           * Matrix.CreateRotationY(e.Rot)
-                           * Matrix.CreateTranslation(e.Pos);
-
-                    foreach (ModelMesh mesh in enemy1.Meshes)
+                    Rectangle mouseRectangle = new Rectangle(mstate.X, mstate.Y, 1, 1);
+                    Rectangle mainmenuRectangle = new Rectangle(350, 325, 100, 46);
+                    if (mouseRectangle.Intersects(mainmenuRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
                     {
-                        foreach (BasicEffect effect in mesh.Effects)
-                        {
-                            effect.World = world;
-                            effect.View = view;
-                            effect.Projection = proj;
+                        info = false;
+                        mainmenu = true;
+                        mRelease = false;
+                    }
+                    if (mstate.LeftButton == ButtonState.Released)
+                    {
+                        mRelease = true;
+                    }
+                }
+                else if (mainmenu == false && info == false && endscreen == true)
+                {
+                    Rectangle mouseRectangle = new Rectangle(mstate.X, mstate.Y, 1, 1);
+                    Rectangle mainmenuRectangle = new Rectangle(350, 325, 100, 46);
+                    if (mouseRectangle.Intersects(mainmenuRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+                    {
+                        mainmenu = true;
+                        endscreen = false;
+                        mRelease = false;
+                    }
+                    if (mstate.LeftButton == ButtonState.Released)
+                    {
+                        mRelease = true;
+                    }
+                }
 
-                            effect.EnableDefaultLighting();
-                            effect.LightingEnabled = true;
-                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
-                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                base.Update(gameTime);
+            }
+
+            void CreateEnvir()
+            {
+                //increased the far cipping plane
+                Matrix proj = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60),
+                                                            (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight,
+                                                            .001f,
+                                                            1000f);
+
+                //code for rotation
+                Matrix view = Matrix.CreateLookAt(
+                    Vector3.Transform(camOffset, Matrix.CreateRotationY(playerRot)),
+                    new Vector3(0, 0, 0),
+                    Vector3.Up);
+
+                //in the distance camera 
+                if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                {
+                    view = Matrix.CreateLookAt(new Vector3(0 + playerPos.X, 10, 30),
+                                             new Vector3(playerPos.X, 0, 0),
+                                             Vector3.Up); //(0,1,0)
+                }
+
+                //matrix world for gun
+                Matrix world = Matrix.CreateRotationY(playerRot)
+                                                  * Matrix.CreateTranslation(playerPos)
+                                                  * Matrix.CreateScale(0.045f) *
+                               Matrix.CreateRotationY(MathHelper.ToRadians(90));
+
+                //matrix world for saloon
+                Matrix environment = Matrix.CreateRotationY(0)
+                                                  * Matrix.CreateTranslation(saloonPos)
+                                                  * Matrix.CreateScale(0.045f) *
+                               Matrix.CreateRotationY(MathHelper.ToRadians(90)) *
+                               Matrix.CreateTranslation(Vector3.Zero);
+
+                //enable the lighting for the gun meshes
+                foreach (ModelMesh mesh in player.Meshes)
+                {
+                    foreach (BasicEffect effect in mesh.Effects)
+                    {
+                        effect.World = world;
+                        effect.View = view;
+                        effect.Projection = proj;
+
+                        effect.EnableDefaultLighting();
+                        effect.LightingEnabled = true;
+                    }
+                }
+
+                //enable the lighting for the saloon meshes
+                foreach (ModelMesh mesh in saloon.Meshes)
+                {
+                    foreach (BasicEffect effect in mesh.Effects)
+                    {
+                        effect.World = world;
+                        effect.View = view;
+                        effect.Projection = proj;
+
+                        effect.EnableDefaultLighting();
+                        effect.LightingEnabled = true;
+                    }
+                }
+
+                player.Draw(world, view, proj);
+                saloon.Draw(environment, view, proj);
+
+                //enable the lighting for the bullet meshes
+                foreach (ModelMesh mesh in bullet.Meshes)
+                {
+                    foreach (BasicEffect effect in mesh.Effects)
+                    {
+                        effect.World = world;
+                        effect.View = view;
+                        effect.Projection = proj;
+
+                        effect.EnableDefaultLighting();
+                        effect.LightingEnabled = true;
+                    }
+                }
+
+                //draw enemies 
+                foreach (Enemy e in enemies)
+                {
+                    if (e.Type == Enemy.EnemyType.enemy1)
+                    {
+                        //was out of order!
+                        world =
+                               Matrix.CreateScale(0.045f)
+                               * Matrix.CreateRotationY(e.Rot)
+                               * Matrix.CreateTranslation(e.Pos);
+
+                        foreach (ModelMesh mesh in enemy1.Meshes)
+                        {
+                            foreach (BasicEffect effect in mesh.Effects)
                             {
+                                effect.World = world;
+                                effect.View = view;
+                                effect.Projection = proj;
+
+                                effect.EnableDefaultLighting();
+                                effect.LightingEnabled = true;
+                                effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+                                if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                                {
+                                    effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                                }
+                                else if (e.Behavior == Enemy.EnemyBehavior.Hurt)
+                                {
+                                    effect.DiffuseColor = Color.Crimson.ToVector3();
+
+                                }
+                                else if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                                {
+                                    effect.World = Matrix.CreateScale(0.045f)
+                                                   * Matrix.CreateRotationY(90)
+                                                   * Matrix.CreateTranslation(e.Pos);
+                                    effect.DiffuseColor = Color.Red.ToVector3();
+                                }
+
+                                else
+                                    effect.DiffuseColor = Color.White.ToVector3();
+
                                 effect.DiffuseColor = Color.DarkCyan.ToVector3();
                             }
                             else if (e.Behavior == Enemy.EnemyBehavior.Hurt)
                             {
                                 effect.DiffuseColor = Color.PeachPuff.ToVector3();
                             }
-                            else if (e.Behavior == Enemy.EnemyBehavior.Dead)
-                            {
-                                effect.World = Matrix.CreateScale(0.045f)
-                                               * Matrix.CreateRotationY(90)
-                                               * Matrix.CreateTranslation(e.Pos);
-                                effect.DiffuseColor = Color.Red.ToVector3();
-                            }
-
-                            else
-                                effect.DiffuseColor = Color.White.ToVector3();
-
+                            enemy1.Draw(world, view, proj);
                         }
-                        enemy1.Draw(world, view, proj);
+                    }
+
+                    else if (e.Type == Enemy.EnemyType.enemy2)
+                    {
+                        //was out of order!
+                        world =
+                               Matrix.CreateScale(0.045f)
+                               * Matrix.CreateRotationY(e.Rot)
+                               * Matrix.CreateTranslation(e.Pos);
+
+                        foreach (ModelMesh mesh in enemy2.Meshes)
+                        {
+                            foreach (BasicEffect effect in mesh.Effects)
+                            {
+                                effect.World = world;
+                                effect.View = view;
+                                effect.Projection = proj;
+
+                                effect.EnableDefaultLighting();
+                                effect.LightingEnabled = true;
+                                effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+                                if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                                {
+                                    effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                                }
+                                if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                                {
+                                    effect.World = Matrix.CreateScale(0.045f)
+                                                   * Matrix.CreateRotationY(90)
+                                                   * Matrix.CreateTranslation(e.Pos);
+                                    effect.DiffuseColor = Color.Red.ToVector3();
+                                }
+                                else
+                                    effect.DiffuseColor = Color.White.ToVector3();
+
+                            }
+                            enemy2.Draw(world, view, proj);
+                        }
+                    }
+
+                    else if (e.Type == Enemy.EnemyType.enemy3)
+                    {
+                        //was out of order!
+                        world =
+                               Matrix.CreateScale(0.045f)
+                               * Matrix.CreateRotationY(e.Rot)
+                               * Matrix.CreateTranslation(e.Pos);
+
+                        foreach (ModelMesh mesh in enemy3.Meshes)
+                        {
+                            foreach (BasicEffect effect in mesh.Effects)
+                            {
+                                effect.World = world;
+                                effect.View = view;
+                                effect.Projection = proj;
+
+                                effect.EnableDefaultLighting();
+                                effect.LightingEnabled = true;
+                                effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+                                if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                                {
+                                    effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                                }
+                                if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                                {
+                                    effect.World = Matrix.CreateScale(0.045f)
+                                                   * Matrix.CreateRotationY(90)
+                                                   * Matrix.CreateTranslation(e.Pos);
+                                    effect.DiffuseColor = Color.Red.ToVector3();
+                                }
+                                else
+                                    effect.DiffuseColor = Color.White.ToVector3();
+
+                            }
+                            enemy3.Draw(world, view, proj);
+                        }
+                    }
+
+                    else if (e.Type == Enemy.EnemyType.enemy4)
+                    {
+                        //was out of order!
+                        world =
+                               Matrix.CreateScale(0.045f)
+                               * Matrix.CreateRotationY(e.Rot)
+                               * Matrix.CreateTranslation(e.Pos);
+
+                        foreach (ModelMesh mesh in enemy4.Meshes)
+                        {
+                            foreach (BasicEffect effect in mesh.Effects)
+                            {
+                                effect.World = world;
+                                effect.View = view;
+                                effect.Projection = proj;
+
+                                effect.EnableDefaultLighting();
+                                effect.LightingEnabled = true;
+                                effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
+                                if (e.Behavior == Enemy.EnemyBehavior.Freeze)
+                                {
+                                    effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                                }
+                                if (e.Behavior == Enemy.EnemyBehavior.Dead)
+                                {
+                                    effect.World = Matrix.CreateScale(0.045f)
+                                                   * Matrix.CreateRotationY(90)
+                                                   * Matrix.CreateTranslation(e.Pos);
+                                    effect.DiffuseColor = Color.Red.ToVector3();
+                                }
+                                else
+                                    effect.DiffuseColor = Color.White.ToVector3();
+
+                            }
+                            enemy4.Draw(world, view, proj);
+                        }
                     }
                 }
 
-                else if (e.Type == Enemy.EnemyType.enemy2)
+                //Draw Bullets
+                foreach (Projectile b in bullets)
                 {
-                    //was out of order!
-                    world =
-                           Matrix.CreateScale(0.045f)
-                           * Matrix.CreateRotationY(e.Rot)
-                           * Matrix.CreateTranslation(e.Pos);
+                    world = Matrix.CreateRotationY(playerRot)
+                        * Matrix.CreateRotationY(MathHelper.ToRadians(270))
+                        * Matrix.CreateScale(0.05f)
+                        * Matrix.CreateTranslation(b.Pos);
 
-                    foreach (ModelMesh mesh in enemy2.Meshes)
-                    {
-                        foreach (BasicEffect effect in mesh.Effects)
-                        {
-                            effect.World = world;
-                            effect.View = view;
-                            effect.Projection = proj;
 
-                            effect.EnableDefaultLighting();
-                            effect.LightingEnabled = true;
-                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
-                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
-                            {
-                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
-                            }
-                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
-                            {
-                                effect.World = Matrix.CreateScale(0.045f)
-                                               * Matrix.CreateRotationY(90)
-                                               * Matrix.CreateTranslation(e.Pos);
-                                effect.DiffuseColor = Color.Red.ToVector3();
-                            }
-                            else
-                                effect.DiffuseColor = Color.White.ToVector3();
-
-                        }
-                        enemy2.Draw(world, view, proj);
-                    }
-                }
-
-                else if (e.Type == Enemy.EnemyType.enemy3)
-                {
-                    //was out of order!
-                    world =
-                           Matrix.CreateScale(0.045f)
-                           * Matrix.CreateRotationY(e.Rot)
-                           * Matrix.CreateTranslation(e.Pos);
-
-                    foreach (ModelMesh mesh in enemy3.Meshes)
-                    {
-                        foreach (BasicEffect effect in mesh.Effects)
-                        {
-                            effect.World = world;
-                            effect.View = view;
-                            effect.Projection = proj;
-
-                            effect.EnableDefaultLighting();
-                            effect.LightingEnabled = true;
-                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
-                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
-                            {
-                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
-                            }
-                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
-                            {
-                                effect.World = Matrix.CreateScale(0.045f)
-                                               * Matrix.CreateRotationY(90)
-                                               * Matrix.CreateTranslation(e.Pos);
-                                effect.DiffuseColor = Color.Red.ToVector3();
-                            }
-                            else
-                                effect.DiffuseColor = Color.White.ToVector3();
-
-                        }
-                        enemy3.Draw(world, view, proj);
-                    }
-                }
-
-                else if (e.Type == Enemy.EnemyType.enemy4)
-                {
-                    //was out of order!
-                    world =
-                           Matrix.CreateScale(0.045f)
-                           * Matrix.CreateRotationY(e.Rot)
-                           * Matrix.CreateTranslation(e.Pos);
-
-                    foreach (ModelMesh mesh in enemy4.Meshes)
-                    {
-                        foreach (BasicEffect effect in mesh.Effects)
-                        {
-                            effect.World = world;
-                            effect.View = view;
-                            effect.Projection = proj;
-
-                            effect.EnableDefaultLighting();
-                            effect.LightingEnabled = true;
-                            effect.EmissiveColor = new Vector3(.05f, .05f, .05f);
-                            if (e.Behavior == Enemy.EnemyBehavior.Freeze)
-                            {
-                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
-                            }
-                            if (e.Behavior == Enemy.EnemyBehavior.Dead)
-                            {
-                                effect.World = Matrix.CreateScale(0.045f)
-                                               * Matrix.CreateRotationY(90)
-                                               * Matrix.CreateTranslation(e.Pos);
-                                effect.DiffuseColor = Color.Red.ToVector3();
-                            }
-                            else
-                                effect.DiffuseColor = Color.White.ToVector3();
-
-                        }
-                        enemy4.Draw(world, view, proj);
-                    }
+                    bullet.Draw(world, view, proj);
                 }
             }
-
-            //Draw Bullets
-            foreach (Projectile b in bullets)
-            {
-                world = Matrix.CreateRotationY(playerRot)
-                    * Matrix.CreateRotationY(MathHelper.ToRadians(270))
-                    * Matrix.CreateScale(0.05f)
-                    * Matrix.CreateTranslation(b.Pos);
-
-
-                bullet.Draw(world, view, proj);
-            }
-        }
 
         protected override void Draw(GameTime gameTime)
         {
