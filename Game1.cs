@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -21,6 +22,11 @@ namespace SaloonShootout
         Texture2D EasyButton;
         Texture2D MediumButton;
         Texture2D HardButton;
+
+        SoundEffect gunshot;
+        SoundEffect grunt;
+        SoundEffect punch;
+        SoundEffect reload;
 
         //1 = easy, 2 = medium, 3 = hard
         int gamemode = 1;
@@ -69,6 +75,7 @@ namespace SaloonShootout
         bool mRelease = true;
         bool rRelease = true;
 
+
         //for different camera view for testing
         Vector3 camOffset;
 
@@ -101,7 +108,6 @@ namespace SaloonShootout
 
             //setting up the spawn times
             previousSpawnTime = TimeSpan.Zero;
-
             enemySpawnTime = TimeSpan.FromSeconds(5.0f);
 
             base.Initialize();
@@ -134,6 +140,11 @@ namespace SaloonShootout
 
             bulletIcon = Content.Load<Texture2D>("BulletIcon");
             gameFont = Content.Load<SpriteFont>("galleryFont");
+
+            gunshot = Content.Load<SoundEffect>("Gunshot");
+            punch = Content.Load<SoundEffect>("Punch");
+            grunt = Content.Load<SoundEffect>("Grunt");
+            reload = Content.Load<SoundEffect>("Reload");
 
             // TODO: use this.Content to load your game content here
         }
@@ -170,6 +181,7 @@ namespace SaloonShootout
 
                     bullets.Add(new Projectile(new Vector3(playerPos.X, (float)3.5, playerPos.Z), playerDir, bullet.Meshes[0].BoundingSphere.Radius));
 
+                    gunshot.Play();
                     bulletCount--;
                     mRelease = false;
                 }
@@ -183,6 +195,7 @@ namespace SaloonShootout
                 {
                     mRelease = true;
                 }
+
                 if (mstate.RightButton == ButtonState.Released)
                 {
                     rRelease = true;
@@ -197,6 +210,15 @@ namespace SaloonShootout
                             lastReload = gameTime.TotalGameTime;
                         }
                     rRelease = false;
+                if (mstate.RightButton == ButtonState.Pressed && mRelaseRight == true)
+                {
+                    reload.Play();
+                    bulletCount = 6;
+                    mRelaseRight = false;
+                }
+                if (mstate.RightButton == ButtonState.Released)
+                {
+                    mRelaseRight = true;
                 }
 
                 //check for collision using vector distance
@@ -209,6 +231,7 @@ namespace SaloonShootout
                             bullets[p].Update(gameTime);
                             bullets.RemoveAt(p);
                             score++;
+                            grunt.Play();
                             --p;
                             break;
                         }
@@ -251,6 +274,7 @@ namespace SaloonShootout
                     e.Update(gameTime);
                     if (e.checkWithPlayer(playerPos))
                     {
+                        punch.Play();
                         health--;
                     }
                 }
@@ -284,6 +308,7 @@ namespace SaloonShootout
 
                     // Add an Enemy
                     enemies.Add(new Enemy());
+
                     foreach (Enemy e in enemies)
                     {
                         e.changeVelocity(gameTime);
@@ -297,9 +322,77 @@ namespace SaloonShootout
                     endscreen = true;
                 }
 
+
+            }
+            else if (mainmenu == true && info == false && endscreen == false)
+            {
+                Rectangle mouseRectangle = new Rectangle(mstate.X, mstate.Y, 1, 1);
+                Rectangle easyRectangle = new Rectangle(200, 225, 100, 46);
+                Rectangle mediumRectangle = new Rectangle(350, 225, 100, 46);
+                Rectangle hardRectangle = new Rectangle(500, 225, 100, 46);
+                Rectangle infoRectangle = new Rectangle(350, 325, 100, 46);
+
+                if (mouseRectangle.Intersects(easyRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+                {
+                    //resetting game play 
+                    timer = 0;
+                    for (int e1 = 0; e1 < enemies.Count; e1++)
+                    {
+                        foreach (Enemy e in enemies)
+                        {
+                            if (e.Pos.Y > 0f)
+                            {
+                                enemies.RemoveAt(e1);
+                                --e1;
+                                break;
+                            }
+                        }
+                    }
+                    gameTime.TotalGameTime = TimeSpan.Zero;
+                    score = 0;
+                    previousSpawnTime = TimeSpan.Zero;
+                    enemySpawnTime = TimeSpan.FromSeconds(5.0f);
+                    playerDir = Vector3.Zero;
+
+
+                    gamemode = 1;
+                    health = 5;
+                    mainmenu = false;
+                    mRelease = false;
+
+                    
+
+                }
+                if (mouseRectangle.Intersects(mediumRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+                {
+                    //resetting game play 
+                    timer = 0;
+                    for (int e1 = 0; e1 < enemies.Count; e1++)
+                    {
+                        foreach (Enemy e in enemies)
+                        {
+                            if (e.Pos.Y > 0f)
+                            {
+                                enemies.RemoveAt(e1);
+                                --e1;
+                                break;
+                            }
+                        }
+                    }
+                    gameTime.TotalGameTime = TimeSpan.Zero;
+                    score = 0;
+                    previousSpawnTime = TimeSpan.Zero;
+                    enemySpawnTime = TimeSpan.FromSeconds(5.0f);
+                    playerDir = Vector3.Zero;
+
+                    gamemode = 2;
+                    health = 3;
+                    mainmenu = false;
+                    mRelease = false;
                 }
                 else if (mainmenu == true && info == false && endscreen == false)
                 {
+
                     Rectangle mouseRectangle = new Rectangle(mstate.X, mstate.Y, 1, 1);
                     Rectangle easyRectangle = new Rectangle(200, 225, 100, 46);
                     Rectangle mediumRectangle = new Rectangle(350, 225, 100, 46);
@@ -334,6 +427,40 @@ namespace SaloonShootout
                     {
                         mRelease = true;
                     }
+                    //resetting game play 
+                    timer = 0;
+                    for (int e1 = 0; e1 < enemies.Count; e1++)
+                    {
+                        foreach (Enemy e in enemies)
+                        {
+                            if (e.Pos.Y > 0f)
+                            {
+                                enemies.RemoveAt(e1);
+                                --e1;
+                                break;
+                            }
+                        }
+                    }
+                    gameTime.TotalGameTime = TimeSpan.Zero;
+                    score = 0;
+                    previousSpawnTime = TimeSpan.Zero;
+                    enemySpawnTime = TimeSpan.FromSeconds(5.0f);
+                    playerDir = Vector3.Zero;
+
+                    gamemode = 3;
+                    health = 1;
+                    mainmenu = false;
+                    mRelease = false;
+                }
+                if (mouseRectangle.Intersects(infoRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
+                {
+                    info = true;
+                    mainmenu = false;
+                    mRelease = false;
+                }
+                if (mstate.LeftButton == ButtonState.Released)
+                {
+                    mRelease = true;
                 }
                 else if (mainmenu == false && info == true && endscreen == false)
                 {
@@ -491,6 +618,11 @@ namespace SaloonShootout
                                 else
                                     effect.DiffuseColor = Color.White.ToVector3();
 
+                                effect.DiffuseColor = Color.DarkCyan.ToVector3();
+                            }
+                            else if (e.Behavior == Enemy.EnemyBehavior.Hurt)
+                            {
+                                effect.DiffuseColor = Color.PeachPuff.ToVector3();
                             }
                             enemy1.Draw(world, view, proj);
                         }
@@ -637,7 +769,6 @@ namespace SaloonShootout
 
             if (mainmenu == true && info == false && endscreen == false)
             {
-
                 _spriteBatch.DrawString(gameFont, "Saloon Shootout!", new Vector2(275, 150), Color.Black);
                 _spriteBatch.Draw(EasyButton, new Vector2(200, 225), Color.White);
                 _spriteBatch.Draw(MediumButton, new Vector2(350, 225), Color.White);
@@ -683,23 +814,23 @@ namespace SaloonShootout
                 //sprite controller for health
                 if (gamemode == 1 || gamemode == 2 || gamemode == 3)
                 {
-                    if (health == 5)
+                    if (health == 5 || (health == 3 && gamemode == 2) || (health == 1 && gamemode == 3))
                     {
                         _spriteBatch.Draw(healthfull, new Vector2(300, 10), Color.White);
                     }
-                    if (health == 4 && (gamemode != 2 || gamemode != 3))
+                    if (health == 4)
                     {
                         _spriteBatch.Draw(health4_5, new Vector2(300, 10), Color.White);
                     }
-                    if (health == 3 && (gamemode != 3))
+                    if ((health == 3 && gamemode == 1) || (health == 2 && gamemode == 2))
                     {
                         _spriteBatch.Draw(health3_5, new Vector2(300, 10), Color.White);
                     }
-                    if (health == 2 && (gamemode != 2 || gamemode != 3))
+                    if (health == 2 && gamemode != 2)
                     {
                         _spriteBatch.Draw(health2_5, new Vector2(300, 10), Color.White);
                     }
-                    if (health == 1 && (gamemode != 3))
+                    if (health == 1 && gamemode != 3)
                     {
                         _spriteBatch.Draw(health1_5, new Vector2(300, 10), Color.White);
                     }
