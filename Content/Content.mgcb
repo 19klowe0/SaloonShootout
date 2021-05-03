@@ -158,6 +158,18 @@
 /processorParam:TextureFormat=Color
 /build:galleryFont.spritefont
 
+#begin Grunt.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Grunt.mp3
+
+#begin Gunshot.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Gunshot.mp3
+
 #begin HardButton.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -277,6 +289,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:MediumButton.png
+
+#begin Punch.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Punch.mp3
+
+#begin Reload.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Reload.wav
 
 #begin RevolverBeforeBake.fbx
 /importer:FbxImporter

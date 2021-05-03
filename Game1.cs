@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -21,6 +22,11 @@ namespace SaloonShootout
         Texture2D EasyButton;
         Texture2D MediumButton;
         Texture2D HardButton;
+
+        SoundEffect gunshot;
+        SoundEffect grunt;
+        SoundEffect punch;
+        SoundEffect reload;
 
         //1 = easy, 2 = medium, 3 = hard
         int gamemode = 1;
@@ -72,6 +78,7 @@ namespace SaloonShootout
         //mousestate
         MouseState mstate;
         bool mRelease = true;
+        bool mRelaseRight = true;
 
         //for different camera view for testing
         Vector3 camOffset;
@@ -135,6 +142,11 @@ namespace SaloonShootout
             bulletIcon = Content.Load<Texture2D>("BulletIcon");
             gameFont = Content.Load<SpriteFont>("galleryFont");
 
+            gunshot = Content.Load<SoundEffect>("Gunshot");
+            punch = Content.Load<SoundEffect>("Punch");
+            grunt = Content.Load<SoundEffect>("Grunt");
+            reload = Content.Load<SoundEffect>("Reload");
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -170,6 +182,7 @@ namespace SaloonShootout
 
                     bullets.Add(new Projectile(new Vector3(playerPos.X, (float)3.5, playerPos.Z), playerDir, bullet.Meshes[0].BoundingSphere.Radius));
 
+                    gunshot.Play();
                     bulletCount--;
                     mRelease = false;
                 }
@@ -183,9 +196,15 @@ namespace SaloonShootout
                 {
                     mRelease = true;
                 }
-                if (mstate.RightButton == ButtonState.Pressed)
+                if (mstate.RightButton == ButtonState.Pressed && mRelaseRight == true)
                 {
+                    reload.Play();
                     bulletCount = 6;
+                    mRelaseRight = false;
+                }
+                if (mstate.RightButton == ButtonState.Released)
+                {
+                    mRelaseRight = true;
                 }
 
                 //check for collision using vector distance
@@ -198,6 +217,7 @@ namespace SaloonShootout
                             bullets[p].Update(gameTime);
                             bullets.RemoveAt(p);
                             score++;
+                            grunt.Play();
                             --p;
                             break;
                         }
@@ -240,6 +260,7 @@ namespace SaloonShootout
                     e.Update(gameTime);
                     if (e.checkWithPlayer(playerPos))
                     {
+                        punch.Play();
                         health--;
                     }
                 }
