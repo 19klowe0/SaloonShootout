@@ -43,8 +43,6 @@ namespace SaloonShootout
         TimeSpan enemySpawnTime;
         TimeSpan previousSpawnTime;
 
-
-
         //needed player information
         Vector3 playerPos;
         Vector3 saloonPos;
@@ -193,17 +191,13 @@ namespace SaloonShootout
                 //reload penalty
                 if (mstate.RightButton == ButtonState.Pressed && rRelease == true && bulletCount < 6)
                 {
-                    if (lastReload + reloadInterval < gameTime.TotalGameTime)
-                    {
-                        bulletCount++;
-                        lastReload = gameTime.TotalGameTime;
-                    }
+                        if (lastReload + reloadInterval < gameTime.TotalGameTime)
+                        {
+                            bulletCount++;
+                            lastReload = gameTime.TotalGameTime;
+                        }
                     rRelease = false;
                 }
-
-
-
-
 
                 //check for collision using vector distance
                 for (int p = 0; p < bullets.Count; p++)
@@ -629,7 +623,6 @@ namespace SaloonShootout
                     bullet.Draw(world, view, proj);
                 }
             }
-
 
         protected override void Draw(GameTime gameTime)
         {
