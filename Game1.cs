@@ -534,8 +534,7 @@ namespace SaloonShootout
                             }
                             else if (e.Behavior == Enemy.EnemyBehavior.Hurt)
                             {
-                                effect.DiffuseColor = Color.Crimson.ToVector3();
-
+                                effect.DiffuseColor = Color.PeachPuff.ToVector3();
                             }
                             else if (e.Behavior == Enemy.EnemyBehavior.Dead)
                             {
@@ -694,7 +693,6 @@ namespace SaloonShootout
 
             if (mainmenu == true && info == false && endscreen == false)
             {
-
                 _spriteBatch.DrawString(gameFont, "Saloon Shootout!", new Vector2(275, 150), Color.Black);
                 _spriteBatch.Draw(EasyButton, new Vector2(200, 225), Color.White);
                 _spriteBatch.Draw(MediumButton, new Vector2(350, 225), Color.White);

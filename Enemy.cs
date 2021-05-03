@@ -69,7 +69,7 @@ namespace SaloonShootout
 
             //grayson add different types/ randomize it here!
             //random type 
-            type = (EnemyType)rand.Next(0, 5);
+            type = (EnemyType)rand.Next(0, 4);
 
             //random hall 
             hall = rand.Next(0, 6);
@@ -193,7 +193,7 @@ namespace SaloonShootout
 
         public bool checkWithPlayer(Vector3 playerPos)
         {
-            if (Vector3.Distance(Pos, playerPos) < 5 && Vector3.Distance(Pos, playerPos) > 4.9)
+            if (Vector3.Distance(Pos, playerPos) < 5 && Vector3.Distance(Pos, playerPos) > 4.8)
             {
                 return true;
             }
