@@ -1,2 +1,5 @@
 # SaloonShootout
-Game coded in Monogame. Cowboy-themed shooting gallery.
+Team Project for CSC 316. 
+Game coded in Monogame.
+Cowboy-themed shooting gallery.
+
