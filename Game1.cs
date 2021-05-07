@@ -199,7 +199,7 @@ namespace SaloonShootout
                 {
                     if (lastReload + reloadInterval < gameTime.TotalGameTime)
                     {
-                        bulletCount = 6;
+                        bulletCount++;
                         lastReload = gameTime.TotalGameTime;
                         reload.Play();
                     }
@@ -322,6 +322,7 @@ namespace SaloonShootout
 
                 if (mouseRectangle.Intersects(easyRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
                 {
+                    bulletCount = 6;
                     //resetting game play 
                     timer = 0;
                     for (int e1 = 0; e1 < enemies.Count; e1++)
@@ -353,6 +354,7 @@ namespace SaloonShootout
                 }
                 if (mouseRectangle.Intersects(mediumRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
                 {
+                    bulletCount = 6;
                     //resetting game play 
                     timer = 0;
                     for (int e1 = 0; e1 < enemies.Count; e1++)
@@ -380,6 +382,7 @@ namespace SaloonShootout
                 }
                 if (mouseRectangle.Intersects(hardRectangle) && mstate.LeftButton == ButtonState.Pressed && mRelease == true)
                 {
+                    bulletCount = 6;
                     //resetting game play 
                     timer = 0;
                     for (int e1 = 0; e1 < enemies.Count; e1++)
